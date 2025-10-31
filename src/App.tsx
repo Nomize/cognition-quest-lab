@@ -8,6 +8,9 @@ import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import FocusQuest from "./pages/quests/FocusQuest";
 import CalmQuest from "./pages/quests/CalmQuest";
+import MemoryQuest from "./pages/quests/MemoryQuest";
+import SpeedQuest from "./pages/quests/SpeedQuest";
+import BrainSwitchQuest from "./pages/quests/BrainSwitchQuest";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -24,6 +27,9 @@ const App = () => (
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/quest/focus" element={<FocusQuest />} />
           <Route path="/quest/calm" element={<CalmQuest />} />
+          <Route path="/quest/memory" element={<MemoryQuest />} />
+          <Route path="/quest/speed" element={<SpeedQuest />} />
+          <Route path="/quest/switch" element={<BrainSwitchQuest />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

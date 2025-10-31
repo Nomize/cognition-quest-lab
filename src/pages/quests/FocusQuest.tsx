@@ -44,8 +44,8 @@ const FocusQuest = () => {
 
   const generateGrid = () => {
     const items: GridItem[] = [];
-    const gridSize = 24;
-    const targetCount = 8;
+    const gridSize = 64;
+    const targetCount = 15;
 
     for (let i = 0; i < targetCount; i++) {
       items.push({
@@ -89,7 +89,14 @@ const FocusQuest = () => {
     if (item.isTarget) {
       setCorrectClicks((prev) => prev + 1);
       setScore((prev) => prev + 10);
-      setGrid((prev) => prev.filter((i) => i.id !== item.id));
+      const newGrid = grid.filter((i) => i.id !== item.id);
+      setGrid(newGrid);
+      
+      // Check if all targets found
+      const targetsLeft = newGrid.filter(i => i.isTarget).length;
+      if (targetsLeft === 0) {
+        finishGame();
+      }
     } else {
       setErrors((prev) => prev + 1);
       setScore((prev) => Math.max(0, prev - 5));
@@ -197,13 +204,15 @@ const FocusQuest = () => {
 
             {gameState === "playing" && (
               <div className="space-y-4">
-                <div className="flex justify-between items-center">
+                <div className="flex justify-between items-center text-lg">
                   <div>Score: <span className="font-bold text-focus">{score}</span></div>
-                  <div>Correct: <span className="font-bold text-secondary">{correctClicks}</span></div>
+                  <div className="text-2xl font-bold">
+                    Targets: <span className="text-focus">{correctClicks}/15</span>
+                  </div>
                   <div>Errors: <span className="font-bold text-destructive">{errors}</span></div>
                 </div>
                 
-                <div className="grid grid-cols-6 gap-4 p-6 bg-accent rounded-lg">
+                <div className="grid grid-cols-8 gap-3 p-6 bg-muted rounded-lg">
                   {grid.map((item) => (
                     <button
                       key={item.id}

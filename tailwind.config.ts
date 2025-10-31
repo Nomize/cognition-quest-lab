@@ -77,6 +77,9 @@ export default {
         "gradient-hero": "var(--gradient-hero)",
         "gradient-calm": "var(--gradient-calm)",
         "gradient-focus": "var(--gradient-focus)",
+        "gradient-memory": "var(--gradient-memory)",
+        "gradient-speed": "var(--gradient-speed)",
+        "gradient-switch": "var(--gradient-switch)",
       },
       borderRadius: {
         lg: "var(--radius)",

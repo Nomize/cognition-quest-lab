@@ -242,9 +242,9 @@ const Dashboard = () => {
         {/* Today's Quests */}
         <div>
           <h2 className="text-2xl font-bold mb-4">Choose Your Quest</h2>
-          <div className="grid md:grid-cols-2 gap-4">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
             <Card 
-              className="shadow-card hover:shadow-soft transition-all cursor-pointer hover:-translate-y-1"
+              className="shadow-card hover:shadow-glow transition-all cursor-pointer hover:-translate-y-1 border-l-4 border-l-focus"
               onClick={() => navigate("/quest/focus")}
             >
               <CardHeader>
@@ -253,8 +253,9 @@ const Dashboard = () => {
                 </div>
                 <CardTitle className="text-focus">Focus Quest</CardTitle>
                 <CardDescription>
-                  Train your attention and concentration
+                  Train attention & concentration
                 </CardDescription>
+                <div className="text-xs text-muted-foreground mt-2">⏱️ 2-3 min</div>
               </CardHeader>
               <CardContent>
                 <Button className="w-full bg-focus hover:bg-focus/90 text-focus-foreground">
@@ -264,7 +265,70 @@ const Dashboard = () => {
             </Card>
 
             <Card 
-              className="shadow-card hover:shadow-soft transition-all cursor-pointer hover:-translate-y-1"
+              className="shadow-card hover:shadow-glow transition-all cursor-pointer hover:-translate-y-1 border-l-4 border-l-memory"
+              onClick={() => navigate("/quest/memory")}
+            >
+              <CardHeader>
+                <div className="w-16 h-16 rounded-2xl bg-memory/20 flex items-center justify-center mb-4">
+                  <Brain className="w-8 h-8 text-memory" />
+                </div>
+                <CardTitle className="text-memory">Memory Quest</CardTitle>
+                <CardDescription>
+                  Pattern recall & working memory
+                </CardDescription>
+                <div className="text-xs text-muted-foreground mt-2">⏱️ 2-3 min</div>
+              </CardHeader>
+              <CardContent>
+                <Button className="w-full bg-memory hover:bg-memory/90 text-memory-foreground">
+                  Start Quest
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card 
+              className="shadow-card hover:shadow-glow transition-all cursor-pointer hover:-translate-y-1 border-l-4 border-l-speed"
+              onClick={() => navigate("/quest/speed")}
+            >
+              <CardHeader>
+                <div className="w-16 h-16 rounded-2xl bg-speed/20 flex items-center justify-center mb-4">
+                  <Zap className="w-8 h-8 text-speed" />
+                </div>
+                <CardTitle className="text-speed">Speed Quest</CardTitle>
+                <CardDescription>
+                  Reaction time challenge
+                </CardDescription>
+                <div className="text-xs text-muted-foreground mt-2">⏱️ 2 min</div>
+              </CardHeader>
+              <CardContent>
+                <Button className="w-full bg-speed hover:bg-speed/90 text-speed-foreground">
+                  Start Quest
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card 
+              className="shadow-card hover:shadow-glow transition-all cursor-pointer hover:-translate-y-1 border-l-4 border-l-switch"
+              onClick={() => navigate("/quest/switch")}
+            >
+              <CardHeader>
+                <div className="w-16 h-16 rounded-2xl bg-switch/20 flex items-center justify-center mb-4">
+                  <Target className="w-8 h-8 text-switch" />
+                </div>
+                <CardTitle className="text-switch">Brain Switch</CardTitle>
+                <CardDescription>
+                  Cognitive flexibility training
+                </CardDescription>
+                <div className="text-xs text-muted-foreground mt-2">⏱️ 3 min</div>
+              </CardHeader>
+              <CardContent>
+                <Button className="w-full bg-switch hover:bg-switch/90 text-switch-foreground">
+                  Start Quest
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card 
+              className="shadow-card hover:shadow-glow transition-all cursor-pointer hover:-translate-y-1 border-l-4 border-l-calm"
               onClick={() => navigate("/quest/calm")}
             >
               <CardHeader>
@@ -273,8 +337,9 @@ const Dashboard = () => {
                 </div>
                 <CardTitle className="text-calm">Calm Quest</CardTitle>
                 <CardDescription>
-                  Guided breathing for mental clarity
+                  Mindfulness breathing exercise
                 </CardDescription>
+                <div className="text-xs text-muted-foreground mt-2">⏱️ 3-5 min</div>
               </CardHeader>
               <CardContent>
                 <Button className="w-full bg-calm hover:bg-calm/90 text-calm-foreground">
