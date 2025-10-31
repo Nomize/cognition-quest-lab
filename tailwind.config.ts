@@ -47,16 +47,36 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        sidebar: {
-          DEFAULT: "hsl(var(--sidebar-background))",
-          foreground: "hsl(var(--sidebar-foreground))",
-          primary: "hsl(var(--sidebar-primary))",
-          "primary-foreground": "hsl(var(--sidebar-primary-foreground))",
-          accent: "hsl(var(--sidebar-accent))",
-          "accent-foreground": "hsl(var(--sidebar-accent-foreground))",
-          border: "hsl(var(--sidebar-border))",
-          ring: "hsl(var(--sidebar-ring))",
+        focus: {
+          DEFAULT: "hsl(var(--focus))",
+          foreground: "hsl(var(--focus-foreground))",
         },
+        memory: {
+          DEFAULT: "hsl(var(--memory))",
+          foreground: "hsl(var(--memory-foreground))",
+        },
+        speed: {
+          DEFAULT: "hsl(var(--speed))",
+          foreground: "hsl(var(--speed-foreground))",
+        },
+        calm: {
+          DEFAULT: "hsl(var(--calm))",
+          foreground: "hsl(var(--calm-foreground))",
+        },
+        switch: {
+          DEFAULT: "hsl(var(--switch))",
+          foreground: "hsl(var(--switch-foreground))",
+        },
+      },
+      boxShadow: {
+        soft: "var(--shadow-soft)",
+        card: "var(--shadow-card)",
+        glow: "var(--shadow-glow)",
+      },
+      backgroundImage: {
+        "gradient-hero": "var(--gradient-hero)",
+        "gradient-calm": "var(--gradient-calm)",
+        "gradient-focus": "var(--gradient-focus)",
       },
       borderRadius: {
         lg: "var(--radius)",
