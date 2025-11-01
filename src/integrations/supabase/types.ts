@@ -83,11 +83,13 @@ export type Database = {
       }
       profiles: {
         Row: {
+          avatar: string | null
           calm_score: number | null
           created_at: string
           current_level: number
           email: string
           focus_score: number | null
+          goals: string[] | null
           id: string
           last_active_date: string | null
           memory_score: number | null
@@ -99,11 +101,13 @@ export type Database = {
           xp_points: number
         }
         Insert: {
+          avatar?: string | null
           calm_score?: number | null
           created_at?: string
           current_level?: number
           email: string
           focus_score?: number | null
+          goals?: string[] | null
           id: string
           last_active_date?: string | null
           memory_score?: number | null
@@ -115,11 +119,13 @@ export type Database = {
           xp_points?: number
         }
         Update: {
+          avatar?: string | null
           calm_score?: number | null
           created_at?: string
           current_level?: number
           email?: string
           focus_score?: number | null
+          goals?: string[] | null
           id?: string
           last_active_date?: string | null
           memory_score?: number | null

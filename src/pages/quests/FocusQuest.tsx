@@ -5,6 +5,8 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { ArrowLeft } from "lucide-react";
+import { calculateLevel } from "@/utils/levelSystem";
+import { useSound } from "@/hooks/useSound";
 
 type Shape = "circle" | "triangle" | "square";
 type Color = "blue" | "red" | "green" | "yellow";
@@ -23,7 +25,7 @@ const FocusQuest = () => {
   const [grid, setGrid] = useState<GridItem[]>([]);
   const [targetShape, setTargetShape] = useState<Shape>("triangle");
   const [targetColor, setTargetColor] = useState<Color>("blue");
-  const [timeLeft, setTimeLeft] = useState(60);
+  const [timeLeft, setTimeLeft] = useState(30);
   const [score, setScore] = useState(0);
   const [correctClicks, setCorrectClicks] = useState(0);
   const [errors, setErrors] = useState(0);
@@ -77,7 +79,7 @@ const FocusQuest = () => {
 
   const startGame = () => {
     setGameState("playing");
-    setTimeLeft(60);
+    setTimeLeft(30);
     setScore(0);
     setCorrectClicks(0);
     setErrors(0);
@@ -88,6 +90,7 @@ const FocusQuest = () => {
     if (gameState !== "playing") return;
 
     if (item.isTarget) {
+      playSound('correct');
       setCorrectClicks((prev) => prev + 1);
       setScore((prev) => prev + 10);
       const newGrid = grid.filter((i) => i.id !== item.id);
@@ -99,6 +102,7 @@ const FocusQuest = () => {
         finishGame();
       }
     } else {
+      playSound('wrong');
       setErrors((prev) => prev + 1);
       setScore((prev) => Math.max(0, prev - 5));
       toast.error("Oops! That's not the target.");
@@ -107,9 +111,11 @@ const FocusQuest = () => {
 
   const finishGame = async () => {
     setGameState("finished");
+    playSound('questComplete');
     
+    const timeBonus = timeLeft > 0 ? Math.floor(timeLeft * 2) : 0;
     const accuracy = correctClicks / (correctClicks + errors) * 100 || 0;
-    const xpEarned = Math.floor(score * 1.5);
+    const xpEarned = Math.floor((score + timeBonus) * 1.5);
 
     try {
       const { data: { user } } = await supabase.auth.getUser();
@@ -118,7 +124,7 @@ const FocusQuest = () => {
           user_id: user.id,
           quest_type: "focus",
           accuracy: accuracy,
-          score: score,
+          score: score + timeBonus,
           xp_earned: xpEarned,
           items_completed: correctClicks,
           errors: errors,
@@ -126,18 +132,28 @@ const FocusQuest = () => {
 
         const { data: profile } = await supabase
           .from("profiles")
-          .select("xp_points, focus_score")
+          .select("xp_points, focus_score, current_level")
           .eq("id", user.id)
           .single();
 
         if (profile) {
+          const newXP = profile.xp_points + xpEarned;
+          const newLevel = calculateLevel(newXP);
+          const leveledUp = newLevel > profile.current_level;
+
           await supabase
             .from("profiles")
             .update({
-              xp_points: profile.xp_points + xpEarned,
+              xp_points: newXP,
+              current_level: newLevel,
               focus_score: Math.min(100, (profile.focus_score || 0) + 2),
             })
             .eq("id", user.id);
+
+          if (leveledUp) {
+            playSound('levelUp');
+            toast.success(`Level Up! You're now Level ${newLevel}!`);
+          }
         }
       }
     } catch (error) {
@@ -189,7 +205,7 @@ const FocusQuest = () => {
                 <div className="space-y-2">
                   <h3 className="text-2xl font-bold">Train Your Focus</h3>
                   <p className="text-muted-foreground max-w-md mx-auto">
-                    Find and click all <span className="font-bold text-primary">blue triangles</span> in the grid below. You have 60 seconds!
+                    Find and click all <span className="font-bold text-primary">blue triangles</span> in the grid below. You have 30 seconds!
                   </p>
                 </div>
                 <div className="flex items-center justify-center gap-4 p-6 bg-accent rounded-lg">
