@@ -18,6 +18,7 @@ interface GridItem {
 
 const FocusQuest = () => {
   const navigate = useNavigate();
+  const { playSound } = useSound();
   const [gameState, setGameState] = useState<"idle" | "playing" | "finished">("idle");
   const [grid, setGrid] = useState<GridItem[]>([]);
   const [targetShape, setTargetShape] = useState<Shape>("triangle");

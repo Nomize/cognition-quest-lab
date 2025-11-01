@@ -6,6 +6,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { ArrowLeft, RefreshCw } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
+import { calculateLevel } from "@/utils/levelSystem";
+import { useSound } from "@/hooks/useSound";
 
 type Rule = "number" | "color";
 type Color = "blue" | "red";
@@ -18,6 +20,7 @@ interface Item {
 
 const BrainSwitchQuest = () => {
   const navigate = useNavigate();
+  const { playSound } = useSound();
   const [gameState, setGameState] = useState<"idle" | "playing" | "finished">("idle");
   const [currentRule, setCurrentRule] = useState<Rule>("number");
   const [currentItem, setCurrentItem] = useState<Item | null>(null);
@@ -81,10 +84,8 @@ const BrainSwitchQuest = () => {
     setAppearTime(Date.now());
     setItemIndex(index);
 
-    setTimeout(() => {
-      if (index === itemIndex) {
-        handleNoClick();
-      }
+    const autoAdvanceTimer = setTimeout(() => {
+      handleNoClick();
     }, 2000);
   };
 
@@ -95,10 +96,12 @@ const BrainSwitchQuest = () => {
     setTotalItems((prev) => prev + 1);
 
     if (currentItem.shouldClick) {
+      playSound('correct');
       setScore((prev) => prev + 10);
       setCorrectClicks((prev) => prev + 1);
       setReactionTimes((prev) => [...prev, reactionTime]);
     } else {
+      playSound('wrong');
       setScore((prev) => Math.max(0, prev - 5));
       toast.error("Wrong! You shouldn't have clicked that one.");
     }
@@ -125,6 +128,7 @@ const BrainSwitchQuest = () => {
 
   const finishGame = async () => {
     setGameState("finished");
+    playSound('questComplete');
     
     const accuracy = totalItems > 0 ? (correctClicks / totalItems) * 100 : 0;
     const avgReactionTime = reactionTimes.length > 0
@@ -147,17 +151,27 @@ const BrainSwitchQuest = () => {
 
         const { data: profile } = await supabase
           .from("profiles")
-          .select("xp_points")
+          .select("xp_points, current_level")
           .eq("id", user.id)
           .single();
 
         if (profile) {
+          const newXP = profile.xp_points + xpEarned;
+          const newLevel = calculateLevel(newXP);
+          const leveledUp = newLevel > profile.current_level;
+
           await supabase
             .from("profiles")
             .update({
-              xp_points: profile.xp_points + xpEarned,
+              xp_points: newXP,
+              current_level: newLevel,
             })
             .eq("id", user.id);
+
+          if (leveledUp) {
+            playSound('levelUp');
+            toast.success(`Level Up! You're now Level ${newLevel}!`);
+          }
         }
       }
     } catch (error) {

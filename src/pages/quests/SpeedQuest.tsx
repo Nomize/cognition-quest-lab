@@ -5,6 +5,8 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { ArrowLeft, Zap } from "lucide-react";
+import { calculateLevel } from "@/utils/levelSystem";
+import { useSound } from "@/hooks/useSound";
 
 interface CircleTarget {
   id: number;
@@ -16,6 +18,7 @@ interface CircleTarget {
 
 const SpeedQuest = () => {
   const navigate = useNavigate();
+  const { playSound } = useSound();
   const [gameState, setGameState] = useState<"idle" | "ready" | "playing" | "finished">("idle");
   const [currentTarget, setCurrentTarget] = useState<CircleTarget | null>(null);
   const [targetIndex, setTargetIndex] = useState(0);
@@ -25,8 +28,8 @@ const SpeedQuest = () => {
   const [appearTime, setAppearTime] = useState(0);
   const [fastestClick, setFastestClick] = useState<number | null>(null);
 
-  const totalTargets = 20;
-  const greenCount = 15;
+  const totalTargets = 40;
+  const greenCount = 20;
 
   const generateTarget = (index: number): CircleTarget => {
     return {
@@ -72,11 +75,13 @@ const SpeedQuest = () => {
     const reactionTime = Date.now() - appearTime;
     
     if (currentTarget.color === "green") {
+      playSound('correct');
       setScore((prev) => prev + 10);
       setCorrectClicks((prev) => prev + 1);
       setReactionTimes((prev) => [...prev, reactionTime]);
       setFastestClick((prev) => prev === null ? reactionTime : Math.min(prev, reactionTime));
     } else {
+      playSound('wrong');
       setScore((prev) => Math.max(0, prev - 15));
       toast.error("Wrong! That was a red circle!");
     }
@@ -97,6 +102,7 @@ const SpeedQuest = () => {
 
   const finishGame = async () => {
     setGameState("finished");
+    playSound('questComplete');
     
     const avgReactionTime = reactionTimes.length > 0 
       ? Math.floor(reactionTimes.reduce((a, b) => a + b, 0) / reactionTimes.length)
@@ -121,18 +127,28 @@ const SpeedQuest = () => {
 
         const { data: profile } = await supabase
           .from("profiles")
-          .select("xp_points, speed_score")
+          .select("xp_points, speed_score, current_level")
           .eq("id", user.id)
           .single();
 
         if (profile) {
+          const newXP = profile.xp_points + xpEarned;
+          const newLevel = calculateLevel(newXP);
+          const leveledUp = newLevel > profile.current_level;
+
           await supabase
             .from("profiles")
             .update({
-              xp_points: profile.xp_points + xpEarned,
+              xp_points: newXP,
+              current_level: newLevel,
               speed_score: Math.min(100, (profile.speed_score || 0) + 3),
             })
             .eq("id", user.id);
+
+          if (leveledUp) {
+            playSound('levelUp');
+            toast.success(`Level Up! You're now Level ${newLevel}!`);
+          }
         }
       }
     } catch (error) {
