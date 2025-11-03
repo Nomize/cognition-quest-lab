@@ -12,6 +12,8 @@ import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
 import Learn from "./pages/Learn";
 import Upgrade from "./pages/Upgrade";
+import Progress from "./pages/Progress";
+import Achievements from "./pages/Achievements";
 import FocusQuest from "./pages/quests/FocusQuest";
 import CalmQuest from "./pages/quests/CalmQuest";
 import MemoryQuest from "./pages/quests/MemoryQuest";
@@ -47,6 +49,8 @@ const App = () => (
                         <Route path="/settings" element={<Settings />} />
                         <Route path="/learn" element={<Learn />} />
                         <Route path="/upgrade" element={<Upgrade />} />
+                        <Route path="/progress" element={<Progress />} />
+                        <Route path="/achievements" element={<Achievements />} />
                         <Route path="/quest/focus" element={<FocusQuest />} />
                         <Route path="/quest/calm" element={<CalmQuest />} />
                         <Route path="/quest/memory" element={<MemoryQuest />} />

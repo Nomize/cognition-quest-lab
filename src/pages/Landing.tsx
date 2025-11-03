@@ -42,9 +42,11 @@ const Landing = () => {
                   Start Your Quest
                 </Button>
               </Link>
-              <Button size="lg" variant="outline" className="text-lg px-8">
-                Learn More
-              </Button>
+              <Link to="/learn">
+                <Button size="lg" variant="outline" className="text-lg px-8">
+                  Learn More
+                </Button>
+              </Link>
             </div>
           </div>
         </div>

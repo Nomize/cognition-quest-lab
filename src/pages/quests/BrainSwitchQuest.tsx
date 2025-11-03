@@ -33,8 +33,7 @@ const BrainSwitchQuest = () => {
   const [reactionTimes, setReactionTimes] = useState<number[]>([]);
   const [ruleJustSwitched, setRuleJustSwitched] = useState(false);
 
-  const totalItemCount = 20;
-  const switchInterval = 4;
+  const totalItemCount = 25;
 
   const generateItem = (index: number, rule: Rule): Item => {
     const number = Math.floor(Math.random() * 9) + 1;
@@ -65,28 +64,39 @@ const BrainSwitchQuest = () => {
       return;
     }
 
-    // Switch rule every 4 items
+    // Switch rule every 5 items
     let newRule = rule;
-    if (index > 0 && index % switchInterval === 0) {
+    if (index > 0 && index % 5 === 0) {
       newRule = rule === "number" ? "color" : "number";
       setCurrentRule(newRule);
       setSwitchCount((prev) => prev + 1);
       setRuleJustSwitched(true);
-      toast.info(`Rule switched! Now: ${newRule === "number" ? "Click if EVEN" : "Click if BLUE"}`, {
-        duration: 1500,
-      });
-    } else {
-      setRuleJustSwitched(false);
+      playSound("click");
+      
+      setTimeout(() => {
+        setRuleJustSwitched(false);
+        const item = generateItem(index, newRule);
+        setCurrentItem(item);
+        setAppearTime(Date.now());
+        setItemIndex(index);
+        
+        setTimeout(() => {
+          handleNoClick();
+        }, 2500);
+      }, 1000);
+      
+      return;
     }
 
+    setRuleJustSwitched(false);
     const item = generateItem(index, newRule);
     setCurrentItem(item);
     setAppearTime(Date.now());
     setItemIndex(index);
 
-    const autoAdvanceTimer = setTimeout(() => {
+    setTimeout(() => {
       handleNoClick();
-    }, 2000);
+    }, 2500);
   };
 
   const handleClick = () => {
@@ -229,13 +239,13 @@ const BrainSwitchQuest = () => {
                   }`}>
                     <div className="flex items-center justify-center gap-2 text-xl font-bold">
                       <RefreshCw className={`w-5 h-5 ${ruleJustSwitched ? "animate-spin" : ""}`} />
-                      RULE: {currentRule === "number" ? "Click if NUMBER is EVEN" : "Click if COLOR is BLUE"}
+                      {ruleJustSwitched ? "⚡ RULE CHANGED!" : `RULE: ${currentRule === "number" ? "Click if NUMBER is EVEN" : "Click if COLOR is BLUE"}`}
                     </div>
                   </div>
                   <Progress value={(itemIndex / totalItemCount) * 100} className="h-2" />
                 </div>
 
-                {currentItem && (
+                {!ruleJustSwitched && currentItem && (
                   <div className="flex flex-col items-center justify-center py-12">
                     <button
                       onClick={handleClick}
@@ -245,6 +255,17 @@ const BrainSwitchQuest = () => {
                     </button>
                     <p className="text-sm text-muted-foreground mt-4">
                       Click if it matches the rule, or wait if it doesn't
+                    </p>
+                  </div>
+                )}
+
+                {ruleJustSwitched && (
+                  <div className="flex flex-col items-center justify-center py-12">
+                    <div className="text-4xl font-bold text-switch animate-bounce">
+                      ⚡ RULE CHANGED! ⚡
+                    </div>
+                    <p className="text-xl mt-4">
+                      New rule: {currentRule === "number" ? "Click if EVEN" : "Click if BLUE"}
                     </p>
                   </div>
                 )}

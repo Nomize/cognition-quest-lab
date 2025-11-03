@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
@@ -7,110 +7,158 @@ import { toast } from "sonner";
 import { ArrowLeft, Zap } from "lucide-react";
 import { calculateLevel } from "@/utils/levelSystem";
 import { useSound } from "@/hooks/useSound";
+import { Progress } from "@/components/ui/progress";
 
-interface CircleTarget {
+interface Circle {
   id: number;
-  color: "green" | "red";
+  color: "green" | "red" | "blue" | "yellow" | "purple";
   x: number;
   y: number;
-  clickTime?: number;
+  createdAt: number;
 }
 
 const SpeedQuest = () => {
   const navigate = useNavigate();
   const { playSound } = useSound();
   const [gameState, setGameState] = useState<"idle" | "ready" | "playing" | "finished">("idle");
-  const [currentTarget, setCurrentTarget] = useState<CircleTarget | null>(null);
-  const [targetIndex, setTargetIndex] = useState(0);
+  const [circles, setCircles] = useState<Circle[]>([]);
   const [score, setScore] = useState(0);
   const [correctClicks, setCorrectClicks] = useState(0);
+  const [wrongClicks, setWrongClicks] = useState(0);
+  const [missedGreen, setMissedGreen] = useState(0);
+  const [combo, setCombo] = useState(0);
+  const [maxCombo, setMaxCombo] = useState(0);
   const [reactionTimes, setReactionTimes] = useState<number[]>([]);
-  const [appearTime, setAppearTime] = useState(0);
   const [fastestClick, setFastestClick] = useState<number | null>(null);
+  const [timeLeft, setTimeLeft] = useState(40);
+  const nextCircleId = useRef(0);
 
-  const totalTargets = 40;
-  const greenCount = 20;
+  const GAME_DURATION = 40; // 40 seconds
+  const CIRCLE_LIFETIME = 1500; // 1.5 seconds before disappearing
 
-  const generateTarget = (index: number): CircleTarget => {
-    return {
-      id: index,
-      color: index < greenCount ? "green" : "red",
-      x: Math.random() * 70 + 15,
-      y: Math.random() * 60 + 20,
+  useEffect(() => {
+    if (gameState === "playing" && timeLeft > 0) {
+      const timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
+      return () => clearTimeout(timer);
+    } else if (timeLeft === 0 && gameState === "playing") {
+      finishGame();
+    }
+  }, [timeLeft, gameState]);
+
+  useEffect(() => {
+    if (gameState !== "playing") return;
+
+    // Spawn circles at random intervals
+    const spawnInterval = setInterval(() => {
+      spawnCircle();
+    }, Math.random() * 500 + 500); // 0.5-1 second
+
+    return () => clearInterval(spawnInterval);
+  }, [gameState]);
+
+  useEffect(() => {
+    if (gameState !== "playing") return;
+
+    // Remove old circles
+    const cleanupInterval = setInterval(() => {
+      const now = Date.now();
+      setCircles((prev) => {
+        const remaining = prev.filter((circle) => {
+          const age = now - circle.createdAt;
+          if (age > CIRCLE_LIFETIME && circle.color === "green") {
+            setMissedGreen((m) => m + 1);
+            setScore((s) => Math.max(0, s - 5));
+            setCombo(0);
+            return false;
+          }
+          return age < CIRCLE_LIFETIME;
+        });
+        return remaining;
+      });
+    }, 100);
+
+    return () => clearInterval(cleanupInterval);
+  }, [gameState]);
+
+  const spawnCircle = () => {
+    // 60% green, 40% other colors
+    const colors: ("green" | "red" | "blue" | "yellow" | "purple")[] = [
+      "green", "green", "green", "green", "green", "green",
+      "red", "blue", "yellow", "purple"
+    ];
+    const color = colors[Math.floor(Math.random() * colors.length)];
+
+    const circle: Circle = {
+      id: nextCircleId.current++,
+      color,
+      x: Math.random() * 80 + 10,
+      y: Math.random() * 70 + 15,
+      createdAt: Date.now(),
     };
+
+    setCircles((prev) => [...prev, circle]);
   };
 
   const startGame = () => {
     setGameState("ready");
     setScore(0);
     setCorrectClicks(0);
+    setWrongClicks(0);
+    setMissedGreen(0);
+    setCombo(0);
+    setMaxCombo(0);
     setReactionTimes([]);
     setFastestClick(null);
-    setTargetIndex(0);
+    setCircles([]);
+    setTimeLeft(GAME_DURATION);
+    nextCircleId.current = 0;
 
     setTimeout(() => {
       setGameState("playing");
-      showNextTarget(0);
     }, 2000);
   };
 
-  const showNextTarget = (index: number) => {
-    if (index >= totalTargets) {
-      finishGame();
-      return;
-    }
+  const handleCircleClick = (circle: Circle) => {
+    if (gameState !== "playing") return;
 
-    const delay = Math.random() * 1000 + 500;
-    
-    setTimeout(() => {
-      const target = generateTarget(index);
-      setCurrentTarget(target);
-      setAppearTime(Date.now());
-    }, delay);
-  };
+    const reactionTime = Date.now() - circle.createdAt;
 
-  const handleTargetClick = () => {
-    if (!currentTarget || gameState !== "playing") return;
-
-    const reactionTime = Date.now() - appearTime;
-    
-    if (currentTarget.color === "green") {
-      playSound('correct');
-      setScore((prev) => prev + 10);
+    if (circle.color === "green") {
+      playSound("correct");
+      const newCombo = combo + 1;
+      setCombo(newCombo);
+      setMaxCombo(Math.max(maxCombo, newCombo));
+      
+      let points = 10;
+      if (newCombo >= 5) {
+        points = 20; // 2x multiplier
+        if (newCombo === 5) toast.success("5x Combo! 2x Points!");
+      }
+      
+      setScore((prev) => prev + points);
       setCorrectClicks((prev) => prev + 1);
       setReactionTimes((prev) => [...prev, reactionTime]);
-      setFastestClick((prev) => prev === null ? reactionTime : Math.min(prev, reactionTime));
+      setFastestClick((prev) => (prev === null ? reactionTime : Math.min(prev, reactionTime)));
     } else {
-      playSound('wrong');
-      setScore((prev) => Math.max(0, prev - 15));
-      toast.error("Wrong! That was a red circle!");
+      playSound("wrong");
+      setScore((prev) => Math.max(0, prev - 10));
+      setWrongClicks((prev) => prev + 1);
+      setCombo(0);
+      toast.error(`Wrong! Avoid ${circle.color}!`);
     }
 
-    setCurrentTarget(null);
-    setTargetIndex((prev) => prev + 1);
-    showNextTarget(targetIndex + 1);
-  };
-
-  const handleMissClick = () => {
-    if (gameState === "playing" && currentTarget?.color === "red") {
-      setScore((prev) => prev + 5);
-      setCurrentTarget(null);
-      setTargetIndex((prev) => prev + 1);
-      showNextTarget(targetIndex + 1);
-    }
+    setCircles((prev) => prev.filter((c) => c.id !== circle.id));
   };
 
   const finishGame = async () => {
     setGameState("finished");
-    playSound('questComplete');
-    
-    const avgReactionTime = reactionTimes.length > 0 
-      ? Math.floor(reactionTimes.reduce((a, b) => a + b, 0) / reactionTimes.length)
+    playSound("questComplete");
+
+    const accuracy = correctClicks / (correctClicks + wrongClicks + missedGreen) * 100 || 0;
+    const avgReaction = reactionTimes.length > 0
+      ? reactionTimes.reduce((a, b) => a + b, 0) / reactionTimes.length
       : 0;
-    
-    const bonusXP = avgReactionTime < 300 ? 50 : 0;
-    const accuracy = (correctClicks / greenCount) * 100;
-    const xpEarned = Math.floor((score + bonusXP) * 1.5);
+    const xpEarned = Math.floor(score * 1.2) + (maxCombo >= 5 ? 50 : 0);
 
     try {
       const { data: { user } } = await supabase.auth.getUser();
@@ -119,10 +167,9 @@ const SpeedQuest = () => {
           user_id: user.id,
           quest_type: "speed",
           accuracy: accuracy,
-          score: score + bonusXP,
+          score: score,
           xp_earned: xpEarned,
           items_completed: correctClicks,
-          reaction_time: avgReactionTime,
         });
 
         const { data: profile } = await supabase
@@ -134,7 +181,11 @@ const SpeedQuest = () => {
         if (profile) {
           const newXP = profile.xp_points + xpEarned;
           const newLevel = calculateLevel(newXP);
-          const leveledUp = newLevel > profile.current_level;
+          const leveledUp = newLevel > (profile.current_level || 1);
+
+          if (leveledUp) {
+            playSound("levelUp");
+          }
 
           await supabase
             .from("profiles")
@@ -144,11 +195,6 @@ const SpeedQuest = () => {
               speed_score: Math.min(100, (profile.speed_score || 0) + 3),
             })
             .eq("id", user.id);
-
-          if (leveledUp) {
-            playSound('levelUp');
-            toast.success(`Level Up! You're now Level ${newLevel}!`);
-          }
         }
       }
     } catch (error) {
@@ -156,13 +202,19 @@ const SpeedQuest = () => {
     }
   };
 
-  const avgReactionTime = reactionTimes.length > 0 
-    ? Math.floor(reactionTimes.reduce((a, b) => a + b, 0) / reactionTimes.length)
-    : 0;
+  const getColorClass = (color: Circle["color"]) => {
+    switch (color) {
+      case "green": return "bg-calm";
+      case "red": return "bg-focus";
+      case "blue": return "bg-primary";
+      case "yellow": return "bg-speed";
+      case "purple": return "bg-memory";
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background p-4">
-      <div className="container mx-auto max-w-4xl space-y-6">
+      <div className="container mx-auto max-w-6xl space-y-6">
         <Button variant="ghost" onClick={() => navigate("/dashboard")}>
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to Dashboard
@@ -171,23 +223,38 @@ const SpeedQuest = () => {
         <Card className="shadow-soft">
           <CardHeader>
             <div className="flex items-center justify-between">
-              <CardTitle className="text-speed">Speed Quest</CardTitle>
+              <CardTitle className="text-speed flex items-center gap-2">
+                <Zap className="h-6 w-6" />
+                Speed Quest
+              </CardTitle>
               {gameState === "playing" && (
-                <div className="text-xl font-bold">{targetIndex}/{totalTargets}</div>
+                <div className="text-right">
+                  <div className="text-2xl font-bold">{timeLeft}s</div>
+                  <div className="text-sm text-muted-foreground">Combo: {combo}x</div>
+                </div>
               )}
             </div>
           </CardHeader>
-          <CardContent className="space-y-6">
+          <CardContent>
             {gameState === "idle" && (
               <div className="text-center space-y-6 py-8">
                 <div className="space-y-2">
                   <h3 className="text-2xl font-bold">Test Your Reflexes</h3>
                   <p className="text-muted-foreground max-w-md mx-auto">
-                    Click the <span className="font-bold text-calm">GREEN</span> circles as fast as you can. 
-                    Avoid the <span className="font-bold text-focus">RED</span> ones!
+                    Click GREEN circles as fast as you can! Avoid red, blue, yellow, and purple circles.
                   </p>
+                  <div className="p-4 bg-accent rounded-lg max-w-sm mx-auto">
+                    <p className="font-medium">Rules:</p>
+                    <ul className="text-sm text-muted-foreground space-y-1 mt-2">
+                      <li>✓ Green circles: +10 points</li>
+                      <li>✗ Wrong color: -10 points</li>
+                      <li>✗ Miss green: -5 points</li>
+                      <li>⚡ 5+ combo: 2x points!</li>
+                      <li>⏱ 40 seconds total</li>
+                    </ul>
+                  </div>
                 </div>
-                <Button size="lg" onClick={startGame} className="bg-speed hover:bg-speed/90 text-foreground">
+                <Button size="lg" onClick={startGame} className="bg-speed hover:bg-speed/90">
                   Start Quest
                 </Button>
               </div>
@@ -195,31 +262,36 @@ const SpeedQuest = () => {
 
             {gameState === "ready" && (
               <div className="text-center py-20">
-                <h3 className="text-3xl font-bold animate-pulse">Get Ready...</h3>
+                <div className="text-6xl font-bold animate-pulse">Get Ready...</div>
               </div>
             )}
 
             {gameState === "playing" && (
-              <div 
-                className="relative bg-muted rounded-lg h-96 cursor-pointer"
-                onClick={handleMissClick}
-              >
-                {currentTarget && (
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleTargetClick();
-                    }}
-                    className={`absolute w-16 h-16 rounded-full transition-transform hover:scale-110 shadow-lg ${
-                      currentTarget.color === "green" ? "bg-calm" : "bg-focus"
-                    }`}
-                    style={{
-                      left: `${currentTarget.x}%`,
-                      top: `${currentTarget.y}%`,
-                      transform: "translate(-50%, -50%)",
-                    }}
-                  />
-                )}
+              <div className="space-y-4">
+                <Progress value={(timeLeft / GAME_DURATION) * 100} />
+                <div className="text-sm text-center flex justify-around">
+                  <span>Score: <strong>{score}</strong></span>
+                  <span>Correct: <strong className="text-calm">{correctClicks}</strong></span>
+                  <span>Wrong: <strong className="text-destructive">{wrongClicks}</strong></span>
+                  <span>Missed: <strong className="text-warning">{missedGreen}</strong></span>
+                </div>
+                <div
+                  className="relative bg-muted rounded-lg"
+                  style={{ height: "500px" }}
+                >
+                  {circles.map((circle) => (
+                    <button
+                      key={circle.id}
+                      onClick={() => handleCircleClick(circle)}
+                      className={`absolute w-16 h-16 rounded-full ${getColorClass(circle.color)} hover:scale-110 transition-transform shadow-lg cursor-pointer`}
+                      style={{
+                        left: `${circle.x}%`,
+                        top: `${circle.y}%`,
+                        transform: "translate(-50%, -50%)",
+                      }}
+                    />
+                  ))}
+                </div>
               </div>
             )}
 
@@ -228,42 +300,45 @@ const SpeedQuest = () => {
                 <div className="space-y-2">
                   <h3 className="text-3xl font-bold text-speed">Quest Complete! ⚡</h3>
                   <div className="text-5xl font-bold text-primary my-4">
-                    +{Math.floor((score + (avgReactionTime < 300 ? 50 : 0)) * 1.5)} XP
+                    +{Math.floor(score * 1.2) + (maxCombo >= 5 ? 50 : 0)} XP
                   </div>
-                  {avgReactionTime < 300 && (
-                    <p className="text-lg text-speed font-semibold">
-                      🎉 Speed Bonus: +50 XP for sub-300ms average!
-                    </p>
-                  )}
                 </div>
 
-                <div className="grid grid-cols-3 gap-4 max-w-md mx-auto">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-2xl mx-auto">
                   <Card>
                     <CardContent className="pt-6 text-center">
-                      <div className="text-2xl font-bold">{avgReactionTime}ms</div>
+                      <div className="text-2xl font-bold">{correctClicks}</div>
+                      <div className="text-sm text-muted-foreground">Correct Clicks</div>
+                    </CardContent>
+                  </Card>
+                  <Card>
+                    <CardContent className="pt-6 text-center">
+                      <div className="text-2xl font-bold">
+                        {reactionTimes.length > 0
+                          ? Math.round(reactionTimes.reduce((a, b) => a + b) / reactionTimes.length)
+                          : 0}ms
+                      </div>
                       <div className="text-sm text-muted-foreground">Avg Reaction</div>
                     </CardContent>
                   </Card>
                   <Card>
                     <CardContent className="pt-6 text-center">
-                      <div className="text-2xl font-bold">{correctClicks}/{greenCount}</div>
-                      <div className="text-sm text-muted-foreground">Correct</div>
+                      <div className="text-2xl font-bold">{fastestClick || 0}ms</div>
+                      <div className="text-sm text-muted-foreground">Fastest</div>
                     </CardContent>
                   </Card>
                   <Card>
                     <CardContent className="pt-6 text-center">
-                      <div className="text-2xl font-bold flex items-center justify-center gap-1">
-                        {fastestClick}ms <Zap className="w-4 h-4 text-speed" />
-                      </div>
-                      <div className="text-sm text-muted-foreground">Fastest</div>
+                      <div className="text-2xl font-bold">{maxCombo}x</div>
+                      <div className="text-sm text-muted-foreground">Best Combo</div>
                     </CardContent>
                   </Card>
                 </div>
 
-                <p className="text-muted-foreground">Lightning reflexes!</p>
+                <p className="text-muted-foreground">Your reflexes are getting sharper!</p>
 
                 <div className="flex gap-4 justify-center">
-                  <Button onClick={startGame} className="bg-speed hover:bg-speed/90 text-foreground">
+                  <Button onClick={startGame} className="bg-speed hover:bg-speed/90">
                     Play Again
                   </Button>
                   <Button variant="outline" onClick={() => navigate("/dashboard")}>

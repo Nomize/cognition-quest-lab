@@ -4,12 +4,16 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { ArrowLeft, Check, X } from "lucide-react";
+import { ArrowLeft, Check, X, RotateCcw } from "lucide-react";
+import { useSound } from "@/hooks/useSound";
+import { calculateLevel } from "@/utils/levelSystem";
+import { Progress } from "@/components/ui/progress";
 
 type Color = "red" | "blue" | "green" | "yellow";
 
 const MemoryQuest = () => {
   const navigate = useNavigate();
+  const { playSound } = useSound();
   const [gameState, setGameState] = useState<"idle" | "showing" | "recall" | "feedback" | "finished">("idle");
   const [currentRound, setCurrentRound] = useState(1);
   const [sequence, setSequence] = useState<Color[]>([]);
@@ -18,6 +22,8 @@ const MemoryQuest = () => {
   const [correctRounds, setCorrectRounds] = useState(0);
   const [longestSequence, setLongestSequence] = useState(0);
   const [roundResult, setRoundResult] = useState<"correct" | "wrong" | null>(null);
+  const [timeLeft, setTimeLeft] = useState(45);
+  const [timerActive, setTimerActive] = useState(false);
 
   const colors: Color[] = ["red", "blue", "green", "yellow"];
   const totalRounds = 5;
@@ -42,6 +48,15 @@ const MemoryQuest = () => {
     startRound(1);
   };
 
+  useEffect(() => {
+    if (timerActive && timeLeft > 0 && gameState === "recall") {
+      const timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
+      return () => clearTimeout(timer);
+    } else if (timeLeft === 0 && gameState === "recall") {
+      checkAnswer(userSequence);
+    }
+  }, [timeLeft, timerActive, gameState]);
+
   const startRound = (round: number) => {
     const sequenceLength = 2 + round;
     const newSequence = generateSequence(sequenceLength);
@@ -49,9 +64,12 @@ const MemoryQuest = () => {
     setUserSequence([]);
     setRoundResult(null);
     setGameState("showing");
+    setTimeLeft(45);
+    setTimerActive(false);
 
     setTimeout(() => {
       setGameState("recall");
+      setTimerActive(true);
     }, 2000 + sequenceLength * 500);
   };
 
@@ -67,17 +85,20 @@ const MemoryQuest = () => {
   };
 
   const checkAnswer = (userSeq: Color[]) => {
+    setTimerActive(false);
     const isCorrect = userSeq.every((color, index) => color === sequence[index]);
     
     setGameState("feedback");
     setRoundResult(isCorrect ? "correct" : "wrong");
 
     if (isCorrect) {
+      playSound("correct");
       setCorrectRounds((prev) => prev + 1);
       setScore((prev) => prev + 20);
       setLongestSequence((prev) => Math.max(prev, sequence.length));
       toast.success("Perfect! +20 XP");
     } else {
+      playSound("wrong");
       setScore((prev) => prev + 5);
       toast.error("Not quite right. +5 XP for trying!");
     }
@@ -92,8 +113,19 @@ const MemoryQuest = () => {
     }, 2500);
   };
 
+  const clearLastColor = () => {
+    if (userSequence.length > 0) {
+      setUserSequence(userSequence.slice(0, -1));
+    }
+  };
+
+  const clearAllColors = () => {
+    setUserSequence([]);
+  };
+
   const finishGame = async () => {
     setGameState("finished");
+    playSound("questComplete");
     
     const accuracy = (correctRounds / totalRounds) * 100;
     const xpEarned = Math.floor(score * 1.5);
@@ -107,20 +139,29 @@ const MemoryQuest = () => {
           accuracy: accuracy,
           score: score,
           xp_earned: xpEarned,
-          items_completed: correctRounds,
+          items_completed: longestSequence,
         });
 
         const { data: profile } = await supabase
           .from("profiles")
-          .select("xp_points, memory_score")
+          .select("xp_points, memory_score, current_level")
           .eq("id", user.id)
           .single();
 
         if (profile) {
+          const newXP = profile.xp_points + xpEarned;
+          const newLevel = calculateLevel(newXP);
+          const leveledUp = newLevel > (profile.current_level || 1);
+
+          if (leveledUp) {
+            playSound("levelUp");
+          }
+
           await supabase
             .from("profiles")
             .update({
-              xp_points: profile.xp_points + xpEarned,
+              xp_points: newXP,
+              current_level: newLevel,
               memory_score: Math.min(100, (profile.memory_score || 0) + 3),
             })
             .eq("id", user.id);
@@ -165,6 +206,18 @@ const MemoryQuest = () => {
 
             {(gameState === "showing" || gameState === "recall") && (
               <div className="space-y-6">
+                {gameState === "recall" && (
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span>Time Remaining</span>
+                      <span className={`font-medium ${timeLeft <= 10 ? "text-destructive" : ""}`}>
+                        {timeLeft}s
+                      </span>
+                    </div>
+                    <Progress value={(timeLeft / 45) * 100} />
+                  </div>
+                )}
+
                 <div className="text-center">
                   <p className="text-lg font-medium mb-4">
                     {gameState === "showing" ? "Watch the sequence..." : "Now repeat it!"}
@@ -179,24 +232,48 @@ const MemoryQuest = () => {
                         }}
                       />
                     ))}
-                    {gameState === "recall" && userSequence.map((color, index) => (
-                      <div
-                        key={index}
-                        className={`w-16 h-16 rounded-full ${colorMap[color]}`}
-                      />
-                    ))}
+                    {gameState === "recall" && (
+                      <div className="flex gap-2">
+                        {sequence.map((_, index) => (
+                          <div
+                            key={index}
+                            className={`w-16 h-16 rounded-full ${
+                              userSequence[index] ? colorMap[userSequence[index]] : "bg-muted border-2 border-dashed"
+                            }`}
+                          />
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
 
                 {gameState === "recall" && (
-                  <div className="flex justify-center gap-4">
-                    {colors.map((color) => (
-                      <button
-                        key={color}
-                        onClick={() => handleColorClick(color)}
-                        className={`w-20 h-20 rounded-full ${colorMap[color]} hover:scale-110 transition-transform shadow-lg`}
-                      />
-                    ))}
+                  <div className="space-y-4">
+                    <div className="flex justify-center gap-4">
+                      {colors.map((color) => (
+                        <button
+                          key={color}
+                          onClick={() => handleColorClick(color)}
+                          disabled={userSequence.length >= sequence.length}
+                          className={`w-20 h-20 rounded-full ${colorMap[color]} hover:scale-110 transition-transform shadow-lg disabled:opacity-50 disabled:cursor-not-allowed`}
+                        />
+                      ))}
+                    </div>
+                    <div className="flex justify-center gap-2">
+                      <Button variant="outline" size="sm" onClick={clearLastColor}>
+                        <RotateCcw className="h-4 w-4 mr-1" />
+                        Clear Last
+                      </Button>
+                      <Button variant="outline" size="sm" onClick={clearAllColors}>
+                        Clear All
+                      </Button>
+                      <Button
+                        onClick={() => checkAnswer(userSequence)}
+                        disabled={userSequence.length !== sequence.length}
+                      >
+                        Submit
+                      </Button>
+                    </div>
                   </div>
                 )}
               </div>
