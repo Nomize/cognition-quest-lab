@@ -32,8 +32,10 @@ const BrainSwitchQuest = () => {
   const [appearTime, setAppearTime] = useState(0);
   const [reactionTimes, setReactionTimes] = useState<number[]>([]);
   const [ruleJustSwitched, setRuleJustSwitched] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null);
 
-  const totalItemCount = 25;
+  const totalItemCount = 20;
 
   const generateItem = (index: number, rule: Rule): Item => {
     const number = Math.floor(Math.random() * 9) + 1;
@@ -64,6 +66,12 @@ const BrainSwitchQuest = () => {
       return;
     }
 
+    // Clear any existing timeout
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+      setTimeoutId(null);
+    }
+
     // Switch rule every 5 items
     let newRule = rule;
     if (index > 0 && index % 5 === 0) {
@@ -75,33 +83,44 @@ const BrainSwitchQuest = () => {
       
       setTimeout(() => {
         setRuleJustSwitched(false);
+        setIsProcessing(false);
         const item = generateItem(index, newRule);
         setCurrentItem(item);
         setAppearTime(Date.now());
         setItemIndex(index);
         
-        setTimeout(() => {
-          handleNoClick();
+        const timeout = setTimeout(() => {
+          handleTimeout();
         }, 2500);
+        setTimeoutId(timeout);
       }, 1000);
       
       return;
     }
 
     setRuleJustSwitched(false);
+    setIsProcessing(false);
     const item = generateItem(index, newRule);
     setCurrentItem(item);
     setAppearTime(Date.now());
     setItemIndex(index);
 
-    setTimeout(() => {
-      handleNoClick();
+    const timeout = setTimeout(() => {
+      handleTimeout();
     }, 2500);
+    setTimeoutId(timeout);
   };
 
   const handleClick = () => {
-    if (!currentItem || gameState !== "playing") return;
+    if (!currentItem || gameState !== "playing" || isProcessing || ruleJustSwitched) return;
 
+    // Clear the auto-advance timeout
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+      setTimeoutId(null);
+    }
+
+    setIsProcessing(true);
     const reactionTime = Date.now() - appearTime;
     setTotalItems((prev) => prev + 1);
 
@@ -120,9 +139,10 @@ const BrainSwitchQuest = () => {
     setTimeout(() => showNextItem(itemIndex + 1, currentRule), 300);
   };
 
-  const handleNoClick = () => {
-    if (!currentItem || gameState !== "playing") return;
+  const handleTimeout = () => {
+    if (!currentItem || gameState !== "playing" || isProcessing) return;
 
+    setIsProcessing(true);
     setTotalItems((prev) => prev + 1);
 
     if (!currentItem.shouldClick) {
