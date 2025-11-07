@@ -7,22 +7,25 @@ import { toast } from "sonner";
 import { ArrowLeft, RefreshCw } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { calculateLevel } from "@/utils/levelSystem";
-import { useSound } from "@/hooks/useSound";
+import { playSound } from "@/utils/sounds";
 
-type Rule = "number" | "color";
-type Color = "blue" | "red";
+type RuleType = "even" | "odd" | "blue" | "red" | "word-match" | "word-blue";
+type Color = "blue" | "red" | "green" | "yellow";
+type StimulusType = "number" | "word";
 
 interface Item {
-  number: number;
+  type: StimulusType;
+  value: number | string;
   color: Color;
   shouldClick: boolean;
 }
 
+const COLOR_WORDS = ["RED", "BLUE", "GREEN", "YELLOW"];
+
 const BrainSwitchQuest = () => {
   const navigate = useNavigate();
-  const { playSound } = useSound();
   const [gameState, setGameState] = useState<"idle" | "playing" | "finished">("idle");
-  const [currentRule, setCurrentRule] = useState<Rule>("number");
+  const [currentRule, setCurrentRule] = useState<RuleType>("even");
   const [currentItem, setCurrentItem] = useState<Item | null>(null);
   const [itemIndex, setItemIndex] = useState(0);
   const [score, setScore] = useState(0);
@@ -34,33 +37,83 @@ const BrainSwitchQuest = () => {
   const [ruleJustSwitched, setRuleJustSwitched] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null);
+  const [encouragementMessage, setEncouragementMessage] = useState("");
 
-  const totalItemCount = 20;
+  const totalItemCount = 24;
+  const ITEM_DISPLAY_TIME = 2500;
+  const RULE_CHANGE_DELAY = 1000;
 
-  const generateItem = (index: number, rule: Rule): Item => {
-    const number = Math.floor(Math.random() * 9) + 1;
-    const color: Color = Math.random() > 0.5 ? "blue" : "red";
+  const RULES: RuleType[] = ["even", "odd", "blue", "red", "word-match", "word-blue"];
+
+  const getRuleDescription = (rule: RuleType) => {
+    switch (rule) {
+      case "even": return "Click if NUMBER is EVEN";
+      case "odd": return "Click if NUMBER is ODD";
+      case "blue": return "Click if COLOR is BLUE";
+      case "red": return "Click if COLOR is RED";
+      case "word-match": return "Click if WORD matches INK COLOR";
+      case "word-blue": return "Click if WORD says BLUE";
+    }
+  };
+
+  const generateItem = (rule: RuleType): Item => {
+    // Determine if we should show number or word
+    const isWordStimulus = rule === "word-match" || rule === "word-blue";
     
-    const shouldClick = rule === "number" 
-      ? number % 2 === 0 
-      : color === "blue";
+    if (isWordStimulus) {
+      // Generate Stroop word stimulus
+      const word = COLOR_WORDS[Math.floor(Math.random() * COLOR_WORDS.length)];
+      const colors: Color[] = ["blue", "red", "green", "yellow"];
+      const inkColor = colors[Math.floor(Math.random() * colors.length)];
+      
+      let shouldClick = false;
+      if (rule === "word-match") {
+        shouldClick = word.toLowerCase() === inkColor;
+      } else if (rule === "word-blue") {
+        shouldClick = word === "BLUE";
+      }
+      
+      return { type: "word", value: word, color: inkColor, shouldClick };
+    } else {
+      // Generate number stimulus
+      const number = Math.floor(Math.random() * 8) + 2; // 2-9
+      const colors: Color[] = ["blue", "red", "green", "yellow"];
+      const color = colors[Math.floor(Math.random() * colors.length)];
+      
+      let shouldClick = false;
+      if (rule === "even") {
+        shouldClick = number % 2 === 0;
+      } else if (rule === "odd") {
+        shouldClick = number % 2 === 1;
+      } else if (rule === "blue") {
+        shouldClick = color === "blue";
+      } else if (rule === "red") {
+        shouldClick = color === "red";
+      }
+      
+      return { type: "number", value: number, color, shouldClick };
+    }
+  };
 
-    return { number, color, shouldClick };
+  const showEncouragement = (message: string) => {
+    setEncouragementMessage(message);
+    setTimeout(() => setEncouragementMessage(""), 1500);
   };
 
   const startGame = () => {
     setGameState("playing");
-    setCurrentRule("number");
+    setCurrentRule("even");
     setItemIndex(0);
     setScore(0);
     setCorrectClicks(0);
     setTotalItems(0);
     setSwitchCount(0);
     setReactionTimes([]);
-    showNextItem(0, "number");
+    setEncouragementMessage("");
+    showNextItem(0, "even");
   };
 
-  const showNextItem = (index: number, rule: Rule) => {
+  const showNextItem = (index: number, rule: RuleType) => {
     if (index >= totalItemCount) {
       finishGame();
       return;
@@ -72,42 +125,47 @@ const BrainSwitchQuest = () => {
       setTimeoutId(null);
     }
 
-    // Switch rule every 5 items
+    // Switch rule every 6 items
     let newRule = rule;
-    if (index > 0 && index % 5 === 0) {
-      newRule = rule === "number" ? "color" : "number";
+    if (index > 0 && index % 6 === 0) {
+      const currentRuleIndex = RULES.indexOf(rule);
+      const nextRuleIndex = (currentRuleIndex + 1) % RULES.length;
+      newRule = RULES[nextRuleIndex];
+      
       setCurrentRule(newRule);
       setSwitchCount((prev) => prev + 1);
       setRuleJustSwitched(true);
-      playSound("click");
+      setIsProcessing(true);
+      playSound("ruleChange");
       
+      // Show rule change screen
       setTimeout(() => {
         setRuleJustSwitched(false);
         setIsProcessing(false);
-        const item = generateItem(index, newRule);
+        const item = generateItem(newRule);
         setCurrentItem(item);
         setAppearTime(Date.now());
         setItemIndex(index);
         
         const timeout = setTimeout(() => {
           handleTimeout();
-        }, 2500);
+        }, ITEM_DISPLAY_TIME);
         setTimeoutId(timeout);
-      }, 1000);
+      }, RULE_CHANGE_DELAY);
       
       return;
     }
 
     setRuleJustSwitched(false);
     setIsProcessing(false);
-    const item = generateItem(index, newRule);
+    const item = generateItem(newRule);
     setCurrentItem(item);
     setAppearTime(Date.now());
     setItemIndex(index);
 
     const timeout = setTimeout(() => {
       handleTimeout();
-    }, 2500);
+    }, ITEM_DISPLAY_TIME);
     setTimeoutId(timeout);
   };
 
@@ -129,9 +187,11 @@ const BrainSwitchQuest = () => {
       setScore((prev) => prev + 10);
       setCorrectClicks((prev) => prev + 1);
       setReactionTimes((prev) => [...prev, reactionTime]);
+      
+      const messages = ["Good!", "Nice!", "Great!", "Excellent!", "Perfect!"];
+      showEncouragement(messages[Math.floor(Math.random() * messages.length)]);
     } else {
       playSound('wrong');
-      setScore((prev) => Math.max(0, prev - 5));
       toast.error("Wrong! You shouldn't have clicked that one.");
     }
 
@@ -148,8 +208,11 @@ const BrainSwitchQuest = () => {
     if (!currentItem.shouldClick) {
       setScore((prev) => prev + 10);
       setCorrectClicks((prev) => prev + 1);
+      
+      const messages = ["Good!", "Nice!", "Correct!"];
+      showEncouragement(messages[Math.floor(Math.random() * messages.length)]);
     } else {
-      setScore((prev) => Math.max(0, prev - 5));
+      playSound('wrong');
     }
 
     setCurrentItem(null);
@@ -209,9 +272,13 @@ const BrainSwitchQuest = () => {
     }
   };
 
-  const colorClasses = {
-    blue: "text-primary",
-    red: "text-focus",
+  const getColorClass = (color: Color) => {
+    switch (color) {
+      case "blue": return "text-primary";
+      case "red": return "text-focus";
+      case "green": return "text-calm";
+      case "yellow": return "text-speed";
+    }
   };
 
   return (
@@ -237,12 +304,18 @@ const BrainSwitchQuest = () => {
                 <div className="space-y-2">
                   <h3 className="text-2xl font-bold">Train Cognitive Flexibility</h3>
                   <p className="text-muted-foreground max-w-md mx-auto">
-                    Follow the rule at the top. The rule will switch every few items - stay sharp!
+                    Follow the rule at the top. The rule will switch every 6 items - stay sharp!
                   </p>
-                  <div className="bg-muted p-4 rounded-lg max-w-sm mx-auto mt-4">
-                    <p className="font-semibold mb-2">Rules:</p>
-                    <p className="text-sm">📊 NUMBER: Click if the number is EVEN</p>
-                    <p className="text-sm">🎨 COLOR: Click if the color is BLUE</p>
+                  <div className="bg-muted p-4 rounded-lg max-w-lg mx-auto mt-4">
+                    <p className="font-semibold mb-2">6 Rule Types:</p>
+                    <div className="text-sm space-y-1 text-left">
+                      <p>1. Click if NUMBER is EVEN</p>
+                      <p>2. Click if NUMBER is ODD</p>
+                      <p>3. Click if COLOR is BLUE</p>
+                      <p>4. Click if COLOR is RED</p>
+                      <p>5. Click if WORD matches INK COLOR (Stroop)</p>
+                      <p>6. Click if WORD says BLUE</p>
+                    </div>
                   </div>
                 </div>
                 <Button size="lg" onClick={startGame} className="bg-switch hover:bg-switch/90">
@@ -259,33 +332,38 @@ const BrainSwitchQuest = () => {
                   }`}>
                     <div className="flex items-center justify-center gap-2 text-xl font-bold">
                       <RefreshCw className={`w-5 h-5 ${ruleJustSwitched ? "animate-spin" : ""}`} />
-                      {ruleJustSwitched ? "⚡ RULE CHANGED!" : `RULE: ${currentRule === "number" ? "Click if NUMBER is EVEN" : "Click if COLOR is BLUE"}`}
+                      {ruleJustSwitched ? "⚡ NEW RULE!" : `RULE: ${getRuleDescription(currentRule)}`}
                     </div>
                   </div>
                   <Progress value={(itemIndex / totalItemCount) * 100} className="h-2" />
                 </div>
 
                 {!ruleJustSwitched && currentItem && (
-                  <div className="flex flex-col items-center justify-center py-12">
+                  <div className="flex flex-col items-center justify-center py-12 relative">
                     <button
                       onClick={handleClick}
-                      className={`text-9xl font-bold ${colorClasses[currentItem.color]} hover:scale-110 transition-transform cursor-pointer`}
+                      className={`text-9xl font-bold ${getColorClass(currentItem.color)} hover:scale-110 transition-transform cursor-pointer`}
                     >
-                      {currentItem.number}
+                      {currentItem.value}
                     </button>
                     <p className="text-sm text-muted-foreground mt-4">
                       Click if it matches the rule, or wait if it doesn't
                     </p>
+                    {encouragementMessage && (
+                      <div className="absolute top-0 text-3xl font-bold text-calm animate-bounce">
+                        {encouragementMessage}
+                      </div>
+                    )}
                   </div>
                 )}
 
                 {ruleJustSwitched && (
                   <div className="flex flex-col items-center justify-center py-12">
                     <div className="text-4xl font-bold text-switch animate-bounce">
-                      ⚡ RULE CHANGED! ⚡
+                      ⚡ NEW RULE! ⚡
                     </div>
                     <p className="text-xl mt-4">
-                      New rule: {currentRule === "number" ? "Click if EVEN" : "Click if BLUE"}
+                      {getRuleDescription(currentRule)}
                     </p>
                   </div>
                 )}

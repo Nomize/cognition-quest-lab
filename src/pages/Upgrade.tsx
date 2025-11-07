@@ -28,7 +28,7 @@ const Upgrade = () => {
     }
   };
 
-  const PAYSTACK_PUBLIC_KEY = 'pk_test_xxxxxxxxxxxxx'; // Replace with actual key
+  const PAYSTACK_PUBLIC_KEY = import.meta.env.VITE_PAYSTACK_PUBLIC_KEY || '';
 
   const monthlyConfig = {
     reference: `${userId}_${Date.now()}`,
@@ -92,6 +92,16 @@ const Upgrade = () => {
       navigate('/auth');
       return;
     }
+    
+    if (!PAYSTACK_PUBLIC_KEY || PAYSTACK_PUBLIC_KEY.length === 0) {
+      toast({
+        title: "Configuration Error",
+        description: "Payment system is not properly configured. Please contact support.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     initializeMonthly({ onSuccess, onClose });
   };
 
@@ -105,6 +115,16 @@ const Upgrade = () => {
       navigate('/auth');
       return;
     }
+    
+    if (!PAYSTACK_PUBLIC_KEY || PAYSTACK_PUBLIC_KEY.length === 0) {
+      toast({
+        title: "Configuration Error",
+        description: "Payment system is not properly configured. Please contact support.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     initializeAnnual({ onSuccess, onClose });
   };
 

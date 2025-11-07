@@ -6,7 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { ArrowLeft, Zap } from "lucide-react";
 import { calculateLevel } from "@/utils/levelSystem";
-import { useSound } from "@/hooks/useSound";
+import { playSound } from "@/utils/sounds";
 import { Progress } from "@/components/ui/progress";
 
 interface Circle {
@@ -19,7 +19,6 @@ interface Circle {
 
 const SpeedQuest = () => {
   const navigate = useNavigate();
-  const { playSound } = useSound();
   const [gameState, setGameState] = useState<"idle" | "ready" | "playing" | "finished">("idle");
   const [circles, setCircles] = useState<Circle[]>([]);
   const [score, setScore] = useState(0);
@@ -30,11 +29,18 @@ const SpeedQuest = () => {
   const [maxCombo, setMaxCombo] = useState(0);
   const [reactionTimes, setReactionTimes] = useState<number[]>([]);
   const [fastestClick, setFastestClick] = useState<number | null>(null);
-  const [timeLeft, setTimeLeft] = useState(40);
+  const [timeLeft, setTimeLeft] = useState(30);
+  const [encouragementMessage, setEncouragementMessage] = useState("");
   const nextCircleId = useRef(0);
 
-  const GAME_DURATION = 40; // 40 seconds
-  const CIRCLE_LIFETIME = 1500; // 1.5 seconds before disappearing
+  const GAME_DURATION = 30; // 30 seconds
+  const CIRCLE_LIFETIME = 2000; // 2 seconds before disappearing
+  const MAX_CIRCLES = 3; // Max 2-3 circles on screen
+
+  const showEncouragement = (message: string) => {
+    setEncouragementMessage(message);
+    setTimeout(() => setEncouragementMessage(""), 1000);
+  };
 
   useEffect(() => {
     if (gameState === "playing" && timeLeft > 0) {
@@ -48,18 +54,20 @@ const SpeedQuest = () => {
   useEffect(() => {
     if (gameState !== "playing") return;
 
-    // Spawn circles at random intervals
+    // Spawn circles at slower intervals (1.2-1.5s)
     const spawnInterval = setInterval(() => {
-      spawnCircle();
-    }, Math.random() * 500 + 500); // 0.5-1 second
+      if (circles.length < MAX_CIRCLES) {
+        spawnCircle();
+      }
+    }, Math.random() * 300 + 1200); // 1.2-1.5 seconds
 
     return () => clearInterval(spawnInterval);
-  }, [gameState]);
+  }, [gameState, circles.length]);
 
   useEffect(() => {
     if (gameState !== "playing") return;
 
-    // Remove old circles
+    // Remove old circles (no penalty for missing)
     const cleanupInterval = setInterval(() => {
       const now = Date.now();
       setCircles((prev) => {
@@ -67,8 +75,7 @@ const SpeedQuest = () => {
           const age = now - circle.createdAt;
           if (age > CIRCLE_LIFETIME && circle.color === "green") {
             setMissedGreen((m) => m + 1);
-            setScore((s) => Math.max(0, s - 5));
-            setCombo(0);
+            // NO PENALTY - just track for stats
             return false;
           }
           return age < CIRCLE_LIFETIME;
@@ -81,10 +88,10 @@ const SpeedQuest = () => {
   }, [gameState]);
 
   const spawnCircle = () => {
-    // 60% green, 40% other colors
+    // 70% green, 30% other colors
     const colors: ("green" | "red" | "blue" | "yellow" | "purple")[] = [
-      "green", "green", "green", "green", "green", "green",
-      "red", "blue", "yellow", "purple"
+      "green", "green", "green", "green", "green", "green", "green",
+      "red", "blue", "purple"
     ];
     const color = colors[Math.floor(Math.random() * colors.length)];
 
@@ -111,6 +118,7 @@ const SpeedQuest = () => {
     setFastestClick(null);
     setCircles([]);
     setTimeLeft(GAME_DURATION);
+    setEncouragementMessage("");
     nextCircleId.current = 0;
 
     setTimeout(() => {
@@ -130,9 +138,17 @@ const SpeedQuest = () => {
       setMaxCombo(Math.max(maxCombo, newCombo));
       
       let points = 10;
+      const messages = ["Good!", "Nice!", "Great!", "Excellent!", "Amazing!"];
       if (newCombo >= 5) {
         points = 20; // 2x multiplier
-        if (newCombo === 5) toast.success("5x Combo! 2x Points!");
+        if (newCombo === 5) {
+          toast.success("5x Combo! 2x Points!");
+          showEncouragement("🔥 ON FIRE! 🔥");
+        } else {
+          showEncouragement(messages[Math.min(newCombo - 1, messages.length - 1)]);
+        }
+      } else {
+        showEncouragement(messages[Math.min(newCombo - 1, messages.length - 1)]);
       }
       
       setScore((prev) => prev + points);
@@ -141,7 +157,7 @@ const SpeedQuest = () => {
       setFastestClick((prev) => (prev === null ? reactionTime : Math.min(prev, reactionTime)));
     } else {
       playSound("wrong");
-      setScore((prev) => Math.max(0, prev - 10));
+      // NO PENALTY - just track wrong clicks
       setWrongClicks((prev) => prev + 1);
       setCombo(0);
       toast.error(`Wrong! Avoid ${circle.color}!`);
@@ -247,10 +263,10 @@ const SpeedQuest = () => {
                     <p className="font-medium">Rules:</p>
                     <ul className="text-sm text-muted-foreground space-y-1 mt-2">
                       <li>✓ Green circles: +10 points</li>
-                      <li>✗ Wrong color: -10 points</li>
-                      <li>✗ Miss green: -5 points</li>
+                      <li>✗ Wrong color: No penalty (tracked only)</li>
+                      <li>✗ Miss green: No penalty (tracked only)</li>
                       <li>⚡ 5+ combo: 2x points!</li>
-                      <li>⏱ 40 seconds total</li>
+                      <li>⏱ 30 seconds total</li>
                     </ul>
                   </div>
                 </div>
@@ -272,8 +288,8 @@ const SpeedQuest = () => {
                 <div className="text-sm text-center flex justify-around">
                   <span>Score: <strong>{score}</strong></span>
                   <span>Correct: <strong className="text-calm">{correctClicks}</strong></span>
-                  <span>Wrong: <strong className="text-destructive">{wrongClicks}</strong></span>
-                  <span>Missed: <strong className="text-warning">{missedGreen}</strong></span>
+                  <span>Wrong: <strong className="text-warning">{wrongClicks}</strong></span>
+                  <span>Missed: <strong className="text-muted-foreground">{missedGreen}</strong></span>
                 </div>
                 <div
                   className="relative bg-muted rounded-lg"
@@ -291,6 +307,11 @@ const SpeedQuest = () => {
                       }}
                     />
                   ))}
+                  {encouragementMessage && (
+                    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-4xl font-bold text-calm animate-bounce pointer-events-none">
+                      {encouragementMessage}
+                    </div>
+                  )}
                 </div>
               </div>
             )}
