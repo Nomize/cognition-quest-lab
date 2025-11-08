@@ -25,6 +25,7 @@ import FocusFlipQuest from "./pages/quests/FocusFlipQuest";
 import PatternSprintQuest from "./pages/quests/PatternSprintQuest";
 import MindMatchQuest from "./pages/quests/MindMatchQuest";
 import ReactionRunQuest from "./pages/quests/ReactionRunQuest";
+import Insights from "./pages/Insights";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -68,6 +69,7 @@ const App = () => (
                         <Route path="/quest/pattern-sprint" element={<PatternSprintQuest />} />
                         <Route path="/quest/mind-match" element={<MindMatchQuest />} />
                         <Route path="/quest/reaction-run" element={<ReactionRunQuest />} />
+                        <Route path="/insights" element={<Insights />} />
                         <Route path="*" element={<NotFound />} />
                       </Routes>
                     </main>

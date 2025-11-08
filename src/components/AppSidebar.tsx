@@ -1,4 +1,4 @@
-import { Home, Gamepad2, BarChart3, Trophy, User, BookOpen, CreditCard, Settings as SettingsIcon } from "lucide-react";
+import { Home, Gamepad2, BarChart3, Trophy, User, BookOpen, CreditCard, Settings as SettingsIcon, Sparkles } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import {
   Sidebar,
@@ -15,6 +15,7 @@ const menuItems = [
   { title: "Dashboard", url: "/dashboard", icon: Home },
   { title: "Quests", url: "/quests", icon: Gamepad2 },
   { title: "Progress", url: "/progress", icon: BarChart3 },
+  { title: "AI Insights", url: "/insights", icon: Sparkles },
   { title: "Achievements", url: "/achievements", icon: Trophy },
   { title: "Learn", url: "/learn", icon: BookOpen },
   { title: "Profile", url: "/profile", icon: User },
