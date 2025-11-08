@@ -20,6 +20,11 @@ import CalmQuest from "./pages/quests/CalmQuest";
 import MemoryQuest from "./pages/quests/MemoryQuest";
 import SpeedQuest from "./pages/quests/SpeedQuest";
 import BrainSwitchQuest from "./pages/quests/BrainSwitchQuest";
+import MemoryMazeQuest from "./pages/quests/MemoryMazeQuest";
+import FocusFlipQuest from "./pages/quests/FocusFlipQuest";
+import PatternSprintQuest from "./pages/quests/PatternSprintQuest";
+import MindMatchQuest from "./pages/quests/MindMatchQuest";
+import ReactionRunQuest from "./pages/quests/ReactionRunQuest";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -58,6 +63,11 @@ const App = () => (
                         <Route path="/quest/memory" element={<MemoryQuest />} />
                         <Route path="/quest/speed" element={<SpeedQuest />} />
                         <Route path="/quest/switch" element={<BrainSwitchQuest />} />
+                        <Route path="/quest/memory-maze" element={<MemoryMazeQuest />} />
+                        <Route path="/quest/focus-flip" element={<FocusFlipQuest />} />
+                        <Route path="/quest/pattern-sprint" element={<PatternSprintQuest />} />
+                        <Route path="/quest/mind-match" element={<MindMatchQuest />} />
+                        <Route path="/quest/reaction-run" element={<ReactionRunQuest />} />
                         <Route path="*" element={<NotFound />} />
                       </Routes>
                     </main>

@@ -1,12 +1,15 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { Brain, Target, Zap, MemoryStick, Shuffle, Heart, Lock } from "lucide-react";
+import { Brain, Target, Zap, MemoryStick, Shuffle, Heart, Lock, Grid3x3, Layers, Sparkles } from "lucide-react";
 import { useSound } from "@/hooks/useSound";
+import { useSubscription } from "@/hooks/useSubscription";
+import { Badge } from "@/components/ui/badge";
 
 const Quests = () => {
   const navigate = useNavigate();
   const { playSound } = useSound();
+  const { isPremium, loading } = useSubscription();
 
   const quests = [
     {
@@ -69,10 +72,74 @@ const Quests = () => {
       route: "/quest/calm",
       locked: false,
     },
+    {
+      id: "memory-maze",
+      title: "Memory Maze",
+      description: "4x4 grid path recall challenge",
+      icon: Brain,
+      color: "text-memory",
+      bgColor: "bg-memory/10",
+      difficulty: "Hard",
+      time: "Progressive",
+      route: "/quest/memory-maze",
+      locked: !isPremium,
+    },
+    {
+      id: "focus-flip",
+      title: "Focus Flip",
+      description: "Find matching symbols in grid",
+      icon: Grid3x3,
+      color: "text-focus",
+      bgColor: "bg-focus/10",
+      difficulty: "Medium",
+      time: "45 seconds",
+      route: "/quest/focus-flip",
+      locked: !isPremium,
+    },
+    {
+      id: "pattern-sprint",
+      title: "Pattern Sprint",
+      description: "Predict the next pattern",
+      icon: Sparkles,
+      color: "text-speed",
+      bgColor: "bg-speed/10",
+      difficulty: "Medium",
+      time: "Progressive",
+      route: "/quest/pattern-sprint",
+      locked: !isPremium,
+    },
+    {
+      id: "mind-match",
+      title: "Mind Match",
+      description: "Classic card matching game",
+      icon: Layers,
+      color: "text-memory",
+      bgColor: "bg-memory/10",
+      difficulty: "Easy",
+      time: "Unlimited",
+      route: "/quest/mind-match",
+      locked: !isPremium,
+    },
+    {
+      id: "reaction-run",
+      title: "Reaction Run",
+      description: "Fast target hitting challenge",
+      icon: Zap,
+      color: "text-speed",
+      bgColor: "bg-speed/10",
+      difficulty: "Hard",
+      time: "30 seconds",
+      route: "/quest/reaction-run",
+      locked: !isPremium,
+    },
   ];
 
   const handleQuestClick = (route: string, locked: boolean) => {
-    if (locked) return;
+    if (locked) {
+      playSound("wrong");
+      navigate("/upgrade");
+      return;
+    }
     playSound("click");
     navigate(route);
   };
