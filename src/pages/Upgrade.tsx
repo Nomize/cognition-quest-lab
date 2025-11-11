@@ -63,16 +63,44 @@ const Upgrade = () => {
     console.log('Payment successful:', reference);
     setProcessing(true);
     
+    // Manually create subscription since webhook might not work in test mode
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      const { error } = await supabase
+        .from('subscriptions')
+        .upsert({
+          user_id: user.id,
+          plan_type: 'premium',
+          status: 'active',
+          paystack_reference: reference.reference,
+          amount: 4999,
+          currency: 'NGN',
+          start_date: new Date().toISOString(),
+          end_date: null, // Ongoing until cancelled
+        }, {
+          onConflict: 'user_id'
+        });
+
+      if (!error) {
+        // Also update profile
+        await supabase
+          .from('profiles')
+          .update({ subscription_tier: 'premium' })
+          .eq('id', user.id);
+      }
+    }
+    
     toast({
       title: "Payment successful! 🎉",
       description: "Your premium subscription is now active.",
     });
 
-    // Wait a moment for webhook to process
+    // Wait a moment then redirect
     setTimeout(() => {
       setProcessing(false);
       navigate('/dashboard');
-    }, 3000);
+      window.location.reload(); // Force reload to update subscription status
+    }, 2000);
   };
 
   const onClose = () => {
