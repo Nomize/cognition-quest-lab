@@ -28,7 +28,7 @@ const Upgrade = () => {
     }
   };
 
-  const PAYSTACK_PUBLIC_KEY = import.meta.env.VITE_PAYSTACK_PUBLIC_KEY || import.meta.env.PAYSTACK_PUBLIC_KEY || '';
+  const PAYSTACK_PUBLIC_KEY = 'pk_test_a18da51f4892a582bc29518581569bc15fab5cfb';
 
   const monthlyConfig = {
     reference: `${userId}_${Date.now()}`,
