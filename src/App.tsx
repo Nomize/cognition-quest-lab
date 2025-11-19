@@ -12,6 +12,7 @@ import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
 import Learn from "./pages/Learn";
 import Upgrade from "./pages/Upgrade";
+import PaymentSuccess from "./pages/PaymentSuccess";
 import Progress from "./pages/Progress";
 import Achievements from "./pages/Achievements";
 import Quests from "./pages/Quests";
@@ -56,6 +57,7 @@ const App = () => (
                         <Route path="/settings" element={<Settings />} />
                         <Route path="/learn" element={<Learn />} />
                         <Route path="/upgrade" element={<Upgrade />} />
+                        <Route path="/PaymentSuccess" element={<PaymentSuccess />} />
                         <Route path="/progress" element={<Progress />} />
                         <Route path="/achievements" element={<Achievements />} />
                         <Route path="/quests" element={<Quests />} />

@@ -35,6 +35,7 @@ const Upgrade = () => {
     email: userEmail,
     amount: 499900, // NGN 4,999 in kobo
     publicKey: PAYSTACK_PUBLIC_KEY,
+    callback_url: "https://cognition-quest-lab.vercel.app/payment-success",
     metadata: {
       user_id: userId,
       plan: 'premium',
@@ -48,6 +49,7 @@ const Upgrade = () => {
     email: userEmail,
     amount: 4900000, // NGN 49,000 in kobo
     publicKey: PAYSTACK_PUBLIC_KEY,
+    callback_url: "https://cognition-quest-lab.vercel.app/payment-success",
     metadata: {
       user_id: userId,
       plan: 'premium',
@@ -96,12 +98,14 @@ const Upgrade = () => {
     });
 
     // Wait a moment then redirect
-    setTimeout(() => {
-      setProcessing(false);
-      navigate('/dashboard');
-      window.location.reload(); // Force reload to update subscription status
-    }, 2000);
-  };
+    setTimeout(async () => {
+  setProcessing(false);
+  await supabase.auth.refreshSession();
+  navigate('/dashboard');
+}, 2000);
+};
+
+
 
   const onClose = () => {
     toast({
@@ -278,7 +282,7 @@ const Upgrade = () => {
                       </td>
                       <td className="p-4 text-center">
                         {typeof feature.pro === "boolean" ? (
-                          feature.pro ? (
+                     +     feature.pro ? (
                             <Check className="h-5 w-5 text-primary mx-auto" />
                           ) : (
                             <X className="h-5 w-5 text-muted-foreground mx-auto" />
