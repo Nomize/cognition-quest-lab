@@ -1,215 +1,227 @@
 
 
-🧠 Cognition Quest Lab
+# 🧠 Cognition Quest Lab
 
-🌍 Aligned with UN Sustainable Development Goals (SDG) 3 & 4
+### 🌍 Advancing UN Sustainable Development Goals 3 & 4
 
-Good Health and Well-being (SDG 3) | Quality Education (SDG 4)
-
-
----
-
-📖 Overview
-
-Cognition Quest Lab is a full-stack web application designed to enhance mental well-being and cognitive growth through interactive learning experiences.
-
-The project merges psychology, education, and technology to create a platform where users can explore their cognitive abilities through stimulating exercises, self-assessment tools, and educational resources that foster mindfulness, focus, and intellectual curiosity.
-
-Developed as the final capstone project for the Power Learn Project Africa Academy, Cognition Quest Lab showcases modern web development practices, seamless UI/UX, and meaningful alignment with real-world social impact goals.
-
+**Good Health and Well-being (SDG 3)** | **Quality Education (SDG 4)**
 
 ---
 
-🚀 Live Demo
+## 📖 Overview
 
-👉 Explore Cognition Quest Lab
+Cognition Quest Lab is a full-stack web application built to support mental well-being and cognitive development through interactive learning tools. It blends psychology, learning science and modern web development to help users explore and strengthen their cognitive skills through guided exercises and short educational experiences.
 
-
----
-
-🧩 Key Features
-
-🧠 Cognitive Exercises: Engage users with tasks inspired by psychological principles that promote focus, reasoning, and self-reflection.
-
-🎓 Educational Empowerment: Encourages self-paced learning and growth, supporting SDG 4 (Quality Education).
-
-❤️ Mental Health Support: Aims to increase awareness and accessibility around cognitive health and self-care (SDG 3).
-
-⚡ Smooth UI/UX: Built with React, TypeScript, Tailwind CSS, and shadcn-ui for speed, responsiveness, and beauty.
-
-☁️ Supabase Integration: Handles backend services, authentication, and secure data storage.
-
-💳 Payment Integration (Test Mode): Demonstrates potential for premium access, currently running in test mode.
-
-
+This project was built as the final capstone submission for the  **Power Learn Project Africa Academy** , demonstrating solid engineering, clean UI/UX and a strong focus on meaningful social impact.
 
 ---
 
-🏗️ Tech Stack
+## 🚀 Live Demo
 
-Category	Tools / Libraries
+App:
 
-Frontend	React, TypeScript, Vite
-Styling	Tailwind CSS, shadcn-ui
-Backend	Supabase
-Deployment	Vercel
-State Management	React Hooks / Context API
-Payment	Stripe (Test Keys)
-Linting & Build Tools	ESLint, PostCSS
+👉 **[https://cognition-quest-lab.vercel.app/](https://cognition-quest-lab.vercel.app/)**
 
+Pitch Deck (Gamma):
 
+👉 **[https://gamma.app/docs/Train-Your-Brain-g9wd2smiv33mpmn?mode=doc](https://gamma.app/docs/Train-Your-Brain-g9wd2smiv33mpmn?mode=doc)**
+
+GitHub Repo:
+
+👉 **[https://github.com/Nomize/cognition-quest-lab](https://github.com/Nomize/cognition-quest-lab)**
 
 ---
 
-📂 Project Structure
+## 🧩 Key Features
 
+**Cognitive Training**
+
+Exercises inspired by cognitive psychology to improve focus, memory, reasoning and reflection.
+
+**Educational Growth**
+
+Short lessons and explanations that support self-paced learning and cognitive awareness (SDG 4).
+
+**Mental Health Awareness**
+
+Tools and activities designed to encourage mindfulness, emotional clarity and personal well-being (SDG 3).
+
+**Clean Interface**
+
+Built with React, TypeScript, Tailwind CSS and shadcn-ui for a fast and engaging experience.
+
+**Supabase Backend**
+
+Handles user authentication, data management and API interactions.
+
+**Paystack Payment Integration (Test Mode Active)**
+
+Users can test the premium features flow by using Paystack’s test card details.
+
+Premium access unlocks exclusive tools inside the app.
+
+---
+
+## 🛠️ Tech Stack
+
+| Category         | Tools                     |
+| ---------------- | ------------------------- |
+| Frontend         | React, TypeScript, Vite   |
+| Styling          | Tailwind CSS, shadcn-ui   |
+| Backend          | Supabase                  |
+| Deployment       | Vercel                    |
+| State Management | React Hooks / Context API |
+| Payment          | Paystack (Test Mode)      |
+| Build Tools      | ESLint, PostCSS           |
+
+---
+
+## 📂 Project Structure
+
+```
 cognition-quest-lab/
 │
 ├── public/                 # Static assets
-├── src/                    # Application source code
+├── src/
 │   ├── components/         # Reusable UI components
-│   ├── pages/              # Page routes and logic
-│   ├── lib/                # Utilities and helpers
-│   └── App.tsx             # Root application component
-├── supabase/               # Backend integration and configs
-├── .env                    # Environment variables (not shared publicly)
+│   ├── pages/              # Screens and route logic
+│   ├── lib/                # Helpers and utilities
+│   └── App.tsx             # Root component
+│
+├── supabase/               # Backend config and integration
+├── .env                    # Local environment variables
 ├── package.json            # Dependencies and scripts
-├── vite.config.ts          # Vite configuration
-└── tailwind.config.ts      # Tailwind setup
-
+├── vite.config.ts          # Vite settings
+└── tailwind.config.ts      # Tailwind configuration
+```
 
 ---
 
-⚙️ Installation and Setup
+## ⚙️ Installation and Setup
 
-1. Clone the repository
+**1. Clone the repo**
 
+```bash
 git clone https://github.com/Nomize/cognition-quest-lab.git
 cd cognition-quest-lab
+```
 
-2. Install dependencies
+**2. Install dependencies**
 
-Using npm:
-
+```bash
 npm install
+```
 
-or bun:
+or
 
+```bash
 bun install
+```
 
-3. Configure environment variables
+**3. Add your environment variables**
 
-Create a .env file in the project root and include your Supabase credentials and any other necessary keys. Example:
+Create a `.env` file:
 
+```
 VITE_SUPABASE_URL=your_supabase_url
 VITE_SUPABASE_ANON_KEY=your_supabase_key
-VITE_STRIPE_PUBLIC_KEY=your_stripe_public_key
+VITE_PAYSTACK_PUBLIC_KEY=your_paystack_key
+```
 
-4. Run the project locally
+**4. Start the development server**
 
+```bash
 npm run dev
+```
 
-Then visit http://localhost:5173 in your browser.
-
-
----
-
-🌐 Deployment
-
-The app is deployed on Vercel for continuous integration and delivery.
-
-Every push to the main branch triggers an automatic rebuild.
-
-Environment variables are managed securely through Vercel’s dashboard.
-
-
-Visit: https://cognition-quest-lab.vercel.app
-
+Visit: **[http://localhost:5173](http://localhost:5173/)**
 
 ---
 
-🧠 How It Works
+## 🌐 Deployment
 
-1. Frontend Interface: Users interact with dynamic learning and mental wellness tools through a clean and engaging UI.
+The project is deployed on  **Vercel** .
 
+Pushing to the main branch triggers an automatic build and deployment.
 
-2. Backend (Supabase): Handles authentication, data persistence, and user profiles.
+Environment variables are configured securely in Vercel.
 
-
-3. Cognitive Tools: Each activity is built around psychological principles—designed to challenge thought patterns, improve focus, and build resilience.
-
-
-4. Educational Layer: The app provides structured guidance for mental and cognitive growth, blending psychology and learning science.
-
-
-5. Payment Logic: Integrated using Paystack (Test Mode) for demonstration, showing potential for monetized features or premium content.
-
-
-
+Live application: **[https://cognition-quest-lab.vercel.app](https://cognition-quest-lab.vercel.app/)**
 
 ---
 
-🔮 Future Improvements & Scalability
+## 🧠 How the App Works
 
-1. Full Payment Integration
+1. **User Interface**
 
-Replace Paystack test keys with live payment keys.
+   Users explore interactive cognitive tools through a simple interface.
+2. **Backend Logic**
 
-Add subscription tiers for advanced cognitive tools, guided programs, and personal analytics.
+   Supabase manages accounts, sessions and secure data handling.
+3. **Cognitive Exercises**
 
-Include transaction history and secure receipt generation.
+   Each activity is based on established psychological concepts to help users reflect, analyze and grow.
+4. **Learning Layer**
 
+   Users get concise explanations that translate cognitive concepts into everyday practice.
+5. **Payment Flow (Paystack Test Mode)**
 
-2. Gamification and Progress Tracking
-
-Add leaderboards, badges, and streak systems to increase engagement.
-
-Implement a personal dashboard showing user stats, cognitive progress, and areas of strength.
-
-
-3. AI-Powered Insights
-
-Improve on the AI-based recommendation engine that suggests personalized cognitive exercises based on user patterns.
-
-Use natural language processing to interpret journal entries or quiz results and provide tailored feedback.
-
-
-4. Mobile App Version
-
-Build a React Native or Flutter version to reach mobile users across Africa and beyond.
-
-
-5. Community and Collaboration
-
-Create a social learning space where users can discuss exercises, share experiences, and collaborate on wellness goals.
-
-
-6. Multilingual Accessibility
-
-Translate the interface into French, German, and Swahili for inclusivity across diverse communities.
-
-
-7. Data Analytics Dashboard (Admin)
-
-Allow administrators to visualize engagement metrics, cognitive improvement trends, and user retention rates.
-
-
+   Paystack test details can be used to simulate unlocking premium tools, giving a realistic preview of how monetization would work.
 
 ---
 
-🏅 Project Significance
+## 🔮 Future Improvements
 
-Cognition Quest Lab bridges the gap between psychology, technology, and education, empowering individuals to take control of their learning and well-being.
-It represents a scalable model for digital mental health and learning platforms across Africa, where access to such tools can make measurable social impact.
+**Full Payment Activation**
 
+Switch Paystack to live mode, introduce subscription plans and generate downloadable receipts.
+
+**Gamified Experience**
+
+Add streaks, badges, leaderboards and a stats dashboard.
+
+**AI Insights**
+
+Smarter recommendations and personalized feedback based on user behavior.
+
+**Mobile App Build**
+
+React Native or Flutter version for mobile-first access.
+
+**Community Features**
+
+A social learning space for discussion, motivation and shared progress.
+
+**Multi-language Support**
+
+French, German and Swahili versions to reach more users across Africa and globally.
+
+**Admin Analytics**
+
+A dashboard showing user retention, activity trends and performance data.
 
 ---
 
-👩‍💻 Author
+## 🏅 Why This Project Matters
 
-Nomize Uche
-Power Learn Project Africa Academy — Final Capstone Project
-🔗 GitHub
-🌐 Live App
+Cognition Quest Lab bridges the gap between mental health, learning and digital access.
 
+It demonstrates how well-designed software can help people improve their cognitive well-being and support broader educational equity.
 
+---
+
+## 👩‍💻 Author
+
+ **Uche Nneoma**
+
+Final Capstone Project
+
+Power Learn Project Africa Academy
+
+GitHub: [https://github.com/Nomize](https://github.com/Nomize)
+
+Live App: [https://cognition-quest-lab.vercel.app](https://cognition-quest-lab.vercel.app/)
+
+Pitch Deck: [https://gamma.app/docs/Train-Your-Brain-g9wd2smiv33mpmn?mode=doc](https://gamma.app/docs/Train-Your-Brain-g9wd2smiv33mpmn?mode=doc)
+
+---
