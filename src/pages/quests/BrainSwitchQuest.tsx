@@ -39,11 +39,12 @@ const BrainSwitchQuest = () => {
   const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null);
   const [encouragementMessage, setEncouragementMessage] = useState("");
 
-  const totalItemCount = 24;
+  const totalItemCount = 15; // Reduced from 24
   const ITEM_DISPLAY_TIME = 2500;
-  const RULE_CHANGE_DELAY = 1000;
+  const RULE_CHANGE_DELAY = 1500; // Increased for stability
 
   const RULES: RuleType[] = ["even", "odd", "blue", "red", "word-match", "word-blue"];
+  const [usedRules, setUsedRules] = useState<RuleType[]>([]);
 
   const getRuleDescription = (rule: RuleType) => {
     switch (rule) {
@@ -125,12 +126,18 @@ const BrainSwitchQuest = () => {
       setTimeoutId(null);
     }
 
-    // Switch rule every 6 items
+    // Switch rule every 5 items (15 total = 3 rounds)
     let newRule = rule;
-    if (index > 0 && index % 6 === 0) {
-      const currentRuleIndex = RULES.indexOf(rule);
-      const nextRuleIndex = (currentRuleIndex + 1) % RULES.length;
-      newRule = RULES[nextRuleIndex];
+    if (index > 0 && index % 5 === 0) {
+      // Ensure all rules used before repeating
+      let availableRules = RULES.filter(r => !usedRules.includes(r));
+      if (availableRules.length === 0) {
+        setUsedRules([]);
+        availableRules = RULES;
+      }
+      
+      newRule = availableRules[Math.floor(Math.random() * availableRules.length)];
+      setUsedRules(prev => [...prev, newRule]);
       
       setCurrentRule(newRule);
       setSwitchCount((prev) => prev + 1);
@@ -309,13 +316,14 @@ const BrainSwitchQuest = () => {
                   <div className="bg-muted p-4 rounded-lg max-w-lg mx-auto mt-4">
                     <p className="font-semibold mb-2">6 Rule Types:</p>
                     <div className="text-sm space-y-1 text-left">
-                      <p>1. Click if NUMBER is EVEN</p>
-                      <p>2. Click if NUMBER is ODD</p>
-                      <p>3. Click if COLOR is BLUE</p>
-                      <p>4. Click if COLOR is RED</p>
-                      <p>5. Click if WORD matches INK COLOR (Stroop)</p>
-                      <p>6. Click if WORD says BLUE</p>
+                      <p>1. 🔢 Click if NUMBER is EVEN</p>
+                      <p>2. 🔢 Click if NUMBER is ODD</p>
+                      <p>3. 🎨 Click if COLOR is BLUE</p>
+                      <p>4. 🎨 Click if COLOR is RED</p>
+                      <p>5. 📝 Click if WORD matches INK COLOR (Stroop)</p>
+                      <p>6. 📝 Click if WORD says BLUE</p>
                     </div>
+                    <p className="text-xs text-muted-foreground mt-3">Rules switch every 5 items - stay focused!</p>
                   </div>
                 </div>
                 <Button size="lg" onClick={startGame} className="bg-switch hover:bg-switch/90">
@@ -327,13 +335,18 @@ const BrainSwitchQuest = () => {
             {gameState === "playing" && (
               <div className="space-y-6">
                 <div className="space-y-2">
-                  <div className={`text-center p-4 rounded-lg transition-all ${
-                    ruleJustSwitched ? "bg-switch/20 border-2 border-switch animate-pulse" : "bg-muted"
+                  <div className={`text-center p-6 rounded-lg transition-all ${
+                    ruleJustSwitched ? "bg-switch/30 border-4 border-switch animate-pulse" : "bg-switch/10 border-2 border-switch/50"
                   }`}>
-                    <div className="flex items-center justify-center gap-2 text-xl font-bold">
-                      <RefreshCw className={`w-5 h-5 ${ruleJustSwitched ? "animate-spin" : ""}`} />
-                      {ruleJustSwitched ? "⚡ NEW RULE!" : `RULE: ${getRuleDescription(currentRule)}`}
+                    <div className="flex items-center justify-center gap-3 text-2xl font-bold mb-2">
+                      <RefreshCw className={`w-6 h-6 ${ruleJustSwitched ? "animate-spin" : ""}`} />
+                      {ruleJustSwitched ? "⚡ NEW RULE! ⚡" : `RULE: ${getRuleDescription(currentRule)}`}
                     </div>
+                    {!ruleJustSwitched && (
+                      <p className="text-sm text-muted-foreground mt-1">
+                        Click if it matches, wait if it doesn't
+                      </p>
+                    )}
                   </div>
                   <Progress value={(itemIndex / totalItemCount) * 100} className="h-2" />
                 </div>

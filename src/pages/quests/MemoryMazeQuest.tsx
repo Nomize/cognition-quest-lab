@@ -71,10 +71,10 @@ const MemoryMazeQuest = () => {
 
   const showPath = async (pathToShow: number[]) => {
     for (let i = 0; i < pathToShow.length; i++) {
-      await new Promise((resolve) => setTimeout(resolve, 600));
+      await new Promise((resolve) => setTimeout(resolve, 800));
       highlightCell(pathToShow[i]);
       playSound("correct");
-      await new Promise((resolve) => setTimeout(resolve, 600));
+      await new Promise((resolve) => setTimeout(resolve, 1500)); // Increased display time
       unhighlightCell(pathToShow[i]);
     }
     setGameState("playing");
@@ -209,19 +209,23 @@ const MemoryMazeQuest = () => {
               </div>
             )}
 
-            <div className="grid grid-cols-4 gap-3 aspect-square max-w-md mx-auto">
-              {grid.map((cell) => (
+            <div className="grid grid-cols-4 gap-4 aspect-square max-w-md mx-auto">
+              {grid.map((cell, index) => (
                 <button
                   key={cell.id}
                   onClick={() => handleCellClick(cell.id)}
                   disabled={gameState !== "playing"}
                   className={`
-                    aspect-square rounded-lg border-2 transition-all
-                    ${cell.highlighted ? "bg-memory border-memory scale-95" : "bg-muted/20 border-muted"}
-                    ${cell.userClicked ? "bg-focus/30 border-focus" : ""}
+                    aspect-square rounded-lg border-4 transition-all relative text-xl font-bold
+                    ${cell.highlighted ? "bg-gradient-to-br from-memory to-calm border-memory scale-110 shadow-2xl shadow-memory/50" : "bg-muted/20 border-muted"}
+                    ${cell.userClicked ? "bg-focus/40 border-focus shadow-lg" : ""}
                     ${gameState === "playing" ? "hover:bg-muted/40 cursor-pointer" : "cursor-not-allowed"}
                   `}
-                />
+                >
+                  {gameState === "playing" && (
+                    <span className="text-muted-foreground text-sm">{index + 1}</span>
+                  )}
+                </button>
               ))}
             </div>
 

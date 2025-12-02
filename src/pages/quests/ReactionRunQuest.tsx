@@ -23,6 +23,7 @@ const ReactionRunQuest = () => {
   const [hits, setHits] = useState(0);
   const [misses, setMisses] = useState(0);
   const [timeLeft, setTimeLeft] = useState(30);
+  const [combo, setCombo] = useState(0);
   const [reactionTimes, setReactionTimes] = useState<number[]>([]);
   const targetAppearTimeRef = useRef<number>(0);
 
@@ -50,7 +51,7 @@ const ReactionRunQuest = () => {
     if (gameState === "playing") {
       const interval = setInterval(() => {
         spawnTarget();
-      }, 800);
+      }, 600); // Faster spawn: 0.6s
       return () => clearInterval(interval);
     }
   }, [gameState]);
@@ -63,6 +64,7 @@ const ReactionRunQuest = () => {
     setTimeLeft(30);
     setTargets([]);
     setReactionTimes([]);
+    setCombo(0);
     setGameState("playing");
   };
 
@@ -92,7 +94,7 @@ const ReactionRunQuest = () => {
         }
         return prev.filter((t) => t.id !== id);
       });
-    }, 1200);
+    }, 1000); // Faster disappear: 1s
   };
 
   const handleTargetClick = (targetId: number) => {
@@ -103,7 +105,16 @@ const ReactionRunQuest = () => {
     setTargets((prev) => prev.filter((t) => t.id !== targetId));
     setHits((prev) => prev + 1);
 
-    const points = reactionTime < 300 ? 20 : reactionTime < 500 ? 15 : 10;
+    // Combo system
+    const newCombo = combo + 1;
+    setCombo(newCombo);
+
+    let points = reactionTime < 250 ? 20 : reactionTime < 300 ? 15 : 10;
+    
+    // Combo bonuses
+    if (newCombo >= 5) points += 50;
+    else if (newCombo >= 3) points += 25;
+
     setScore((prev) => prev + points);
 
     if (reactionTime < 250) {
@@ -158,6 +169,14 @@ const ReactionRunQuest = () => {
               </span>
             </div>
 
+            {gameState === "playing" && combo >= 3 && (
+              <div className="text-center py-2 bg-speed/20 rounded-lg border-2 border-speed animate-pulse">
+                <span className="text-xl font-bold text-speed">
+                  🔥 {combo}x COMBO! 🔥
+                </span>
+              </div>
+            )}
+
             {gameState === "idle" && (
               <div className="text-center space-y-4">
                 <p className="text-muted-foreground">
@@ -175,7 +194,7 @@ const ReactionRunQuest = () => {
                   <button
                     key={target.id}
                     onClick={() => handleTargetClick(target.id)}
-                    className="absolute rounded-full bg-speed hover:bg-speed/80 transition-all shadow-lg animate-pulse"
+                    className="absolute rounded-full bg-gradient-to-br from-speed to-speed/60 hover:scale-110 transition-all shadow-2xl shadow-speed/50 animate-pulse"
                     style={{
                       left: `${target.x}%`,
                       top: `${target.y}%`,
