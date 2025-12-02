@@ -33,9 +33,9 @@ const SpeedQuest = () => {
   const [encouragementMessage, setEncouragementMessage] = useState("");
   const nextCircleId = useRef(0);
 
-  const GAME_DURATION = 30; // 30 seconds
-  const CIRCLE_LIFETIME = 2000; // 2 seconds before disappearing
-  const MAX_CIRCLES = 3; // Max 2-3 circles on screen
+  const GAME_DURATION = 35; // 35 seconds
+  const CIRCLE_LIFETIME = 1200; // 1.2 seconds before disappearing
+  const MAX_CIRCLES = 4; // Max 4 circles on screen
 
   const showEncouragement = (message: string) => {
     setEncouragementMessage(message);
@@ -54,12 +54,12 @@ const SpeedQuest = () => {
   useEffect(() => {
     if (gameState !== "playing") return;
 
-    // Spawn circles at slower intervals (1.2-1.5s)
+    // Spawn circles faster (0.8s)
     const spawnInterval = setInterval(() => {
       if (circles.length < MAX_CIRCLES) {
         spawnCircle();
       }
-    }, Math.random() * 300 + 1200); // 1.2-1.5 seconds
+    }, 800); // 0.8 seconds
 
     return () => clearInterval(spawnInterval);
   }, [gameState, circles.length]);
@@ -67,7 +67,7 @@ const SpeedQuest = () => {
   useEffect(() => {
     if (gameState !== "playing") return;
 
-    // Remove old circles (no penalty for missing)
+    // Remove old circles with penalty for missed green
     const cleanupInterval = setInterval(() => {
       const now = Date.now();
       setCircles((prev) => {
@@ -75,7 +75,8 @@ const SpeedQuest = () => {
           const age = now - circle.createdAt;
           if (age > CIRCLE_LIFETIME && circle.color === "green") {
             setMissedGreen((m) => m + 1);
-            // NO PENALTY - just track for stats
+            // PENALTY for missing green circle
+            setScore((s) => Math.max(0, s - 5));
             return false;
           }
           return age < CIRCLE_LIFETIME;
@@ -157,10 +158,11 @@ const SpeedQuest = () => {
       setFastestClick((prev) => (prev === null ? reactionTime : Math.min(prev, reactionTime)));
     } else {
       playSound("wrong");
-      // NO PENALTY - just track wrong clicks
+      // PENALTY for wrong color
+      setScore((prev) => Math.max(0, prev - 15));
       setWrongClicks((prev) => prev + 1);
       setCombo(0);
-      toast.error(`Wrong! Avoid ${circle.color}!`);
+      toast.error(`Wrong color! -15 points`);
     }
 
     setCircles((prev) => prev.filter((c) => c.id !== circle.id));
@@ -263,10 +265,10 @@ const SpeedQuest = () => {
                     <p className="font-medium">Rules:</p>
                     <ul className="text-sm text-muted-foreground space-y-1 mt-2">
                       <li>✓ Green circles: +10 points</li>
-                      <li>✗ Wrong color: No penalty (tracked only)</li>
-                      <li>✗ Miss green: No penalty (tracked only)</li>
-                      <li>⚡ 5+ combo: 2x points!</li>
-                      <li>⏱ 30 seconds total</li>
+                      <li>❌ Wrong color clicked: -15 points</li>
+                      <li>⚠️ Miss green circle: -5 points</li>
+                      <li>🔥 5+ combo: 2x points!</li>
+                      <li>⏱ 35 seconds total</li>
                     </ul>
                   </div>
                 </div>

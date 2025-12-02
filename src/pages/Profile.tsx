@@ -7,10 +7,19 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { User, Mail, Calendar, Target } from "lucide-react";
 import { calculateLevel, getLevelTitle } from "@/utils/levelSystem";
+import { useSubscription } from "@/hooks/useSubscription";
 
-const PRESET_AVATARS = [
-  "🧠", "🎯", "⚡", "🌟", "🚀", "💡", "🎮", "🏆", "🔥", "✨",
-  "🎨", "🌈", "🦋", "🐘", "🦉", "🐬", "🦁", "🐼", "🦊", "🐨"
+// Free users: 8 avatars
+const FREE_AVATARS = [
+  "🧠", "🎯", "⚡", "🌟", "🚀", "💡", "🎮", "🏆"
+];
+
+// Premium only: 30+ additional avatars
+const PREMIUM_AVATARS = [
+  "🔥", "✨", "🎨", "🌈", "🦋", "🐘", "🦉", "🐬", 
+  "🦁", "🐼", "🦊", "🐨", "🐯", "🐱", "🐶", "🐻",
+  "🦄", "🦚", "🦜", "🦩", "🦋", "🐙", "🦑", "🐠",
+  "🌺", "🌸", "🌼", "🌻", "🌷", "🌹", "💐", "🏵️"
 ];
 
 const Profile = () => {
@@ -19,6 +28,8 @@ const Profile = () => {
   const [selectedAvatar, setSelectedAvatar] = useState("🧠");
   const [goals, setGoals] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
+  const [uploadedAvatar, setUploadedAvatar] = useState<string | null>(null);
+  const { isPremium } = useSubscription();
 
   useEffect(() => {
     loadProfile();
@@ -98,15 +109,22 @@ const Profile = () => {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="text-center mb-4">
-                <div className="text-6xl mb-2">{selectedAvatar}</div>
-                <p className="text-sm text-muted-foreground">Choose your avatar</p>
-                <div className="flex flex-wrap gap-2 justify-center mt-2">
-                  {PRESET_AVATARS.map((avatar) => (
+                <div className="text-6xl mb-2">{uploadedAvatar || selectedAvatar}</div>
+                <p className="text-sm text-muted-foreground">
+                  {isPremium ? "Choose from 30+ avatars or upload custom" : "Choose your avatar (Free: 8 options)"}
+                </p>
+                
+                {/* Free Avatars */}
+                <div className="flex flex-wrap gap-2 justify-center mt-3">
+                  {FREE_AVATARS.map((avatar) => (
                     <button
                       key={avatar}
-                      onClick={() => setSelectedAvatar(avatar)}
+                      onClick={() => {
+                        setSelectedAvatar(avatar);
+                        setUploadedAvatar(null);
+                      }}
                       className={`text-2xl p-2 rounded-lg transition-all ${
-                        selectedAvatar === avatar
+                        selectedAvatar === avatar && !uploadedAvatar
                           ? "bg-primary/20 ring-2 ring-primary"
                           : "hover:bg-muted"
                       }`}
@@ -115,6 +133,62 @@ const Profile = () => {
                     </button>
                   ))}
                 </div>
+
+                {/* Premium Avatars - Locked for free users */}
+                {isPremium && (
+                  <>
+                    <p className="text-xs text-muted-foreground mt-4 mb-2">✨ Premium Avatars</p>
+                    <div className="flex flex-wrap gap-2 justify-center">
+                      {PREMIUM_AVATARS.map((avatar) => (
+                        <button
+                          key={avatar}
+                          onClick={() => {
+                            setSelectedAvatar(avatar);
+                            setUploadedAvatar(null);
+                          }}
+                          className={`text-2xl p-2 rounded-lg transition-all ${
+                            selectedAvatar === avatar && !uploadedAvatar
+                              ? "bg-primary/20 ring-2 ring-primary"
+                              : "hover:bg-muted"
+                          }`}
+                        >
+                          {avatar}
+                        </button>
+                      ))}
+                    </div>
+                    
+                    {/* Custom Upload - Premium Only */}
+                    <div className="mt-4">
+                      <Label htmlFor="avatar-upload" className="cursor-pointer">
+                        <div className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition inline-block">
+                          📸 Upload Custom Avatar
+                        </div>
+                      </Label>
+                      <Input
+                        id="avatar-upload"
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            const reader = new FileReader();
+                            reader.onloadend = () => {
+                              setUploadedAvatar(reader.result as string);
+                            };
+                            reader.readAsDataURL(file);
+                          }
+                        }}
+                      />
+                    </div>
+                  </>
+                )}
+
+                {!isPremium && (
+                  <p className="text-xs text-primary mt-3 cursor-pointer" onClick={() => window.location.href = '/upgrade'}>
+                    🔒 Unlock 30+ avatars + custom upload with Premium
+                  </p>
+                )}
               </div>
 
               <div className="space-y-2">

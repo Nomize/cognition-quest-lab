@@ -24,7 +24,7 @@ const FocusFlipQuest = () => {
   const [foundCount, setFoundCount] = useState(0);
   const [totalTargets, setTotalTargets] = useState(0);
   const [score, setScore] = useState(0);
-  const [timeLeft, setTimeLeft] = useState(45);
+  const [timeLeft, setTimeLeft] = useState(40); // Reduced from 45
 
   useEffect(() => {
     if (!loading && !isPremium) {
@@ -51,8 +51,9 @@ const FocusFlipQuest = () => {
     const target = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
     setTargetSymbol(target);
 
-    const targetCount = 6;
-    const totalCells = 16;
+    // Difficulty scaling
+    const targetCount = 8; // Increased from 6
+    const totalCells = 20; // Increased from 16
     const cells: Cell[] = [];
 
     for (let i = 0; i < targetCount; i++) {
@@ -73,7 +74,7 @@ const FocusFlipQuest = () => {
     setTotalTargets(targetCount);
     setFoundCount(0);
     setScore(0);
-    setTimeLeft(45);
+    setTimeLeft(40); // Reduced from 45
     setGameState("playing");
   };
 
@@ -164,14 +165,14 @@ const FocusFlipQuest = () => {
             )}
 
             {(gameState === "playing" || gameState === "complete") && (
-              <div className="grid grid-cols-4 gap-3 max-w-md mx-auto">
+              <div className="grid grid-cols-5 gap-3 max-w-lg mx-auto">
                 {grid.map((cell) => (
                   <button
                     key={cell.id}
                     onClick={() => handleCellClick(cell.id)}
                     disabled={gameState !== "playing" || cell.matched}
                     className={`
-                      aspect-square rounded-lg border-2 text-4xl transition-all
+                      aspect-square rounded-lg border-2 text-3xl transition-all
                       ${cell.matched ? "bg-focus/20 border-focus opacity-50" : "bg-muted/20 border-muted"}
                       ${gameState === "playing" && !cell.matched ? "hover:bg-muted/40 cursor-pointer" : "cursor-not-allowed"}
                     `}

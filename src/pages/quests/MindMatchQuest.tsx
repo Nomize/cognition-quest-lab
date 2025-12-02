@@ -182,15 +182,18 @@ const MindMatchQuest = () => {
             {gameState === "complete" && (
               <div className="text-center space-y-4 p-6 bg-muted/50 rounded-lg mt-6">
                 <Trophy className="w-16 h-16 mx-auto text-primary" />
-                <h3 className="text-2xl font-bold">Quest Complete!</h3>
+                <h3 className="text-2xl font-bold">Quest Complete! 🎉</h3>
                 <p className="text-xl">Final Score: {score}</p>
                 <p className="text-muted-foreground">Completed in {moves} moves!</p>
-                <div className="flex gap-2 justify-center">
-                  <Button onClick={() => navigate("/quests")}>
+                <div className="flex gap-3 justify-center flex-wrap">
+                  <Button onClick={() => navigate("/quests")} variant="outline">
                     Back to Quests
                   </Button>
+                  <Button onClick={startGame}>
+                    Next Round (Harder) →
+                  </Button>
                   <Button onClick={() => window.location.reload()} variant="outline">
-                    Play Again
+                    Restart
                   </Button>
                 </div>
               </div>
