@@ -79,6 +79,12 @@ All colors MUST be HSL.
 
     /* Transitions */
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+    /* Sidebar - Light mode */
+    --sidebar: 0 0% 100%;
+    --sidebar-foreground: 222 47% 11%;
+    --sidebar-border: 214 32% 91%;
+    --sidebar-accent: 210 40% 96%;
   }
 
   .dark {
@@ -113,6 +119,12 @@ All colors MUST be HSL.
     --calm-foreground: 0 0% 100%;
     --switch: 27 96% 61%;
     --switch-foreground: 0 0% 100%;
+
+    /* Sidebar - Dark mode */
+    --sidebar: 217 33% 17%;
+    --sidebar-foreground: 210 40% 98%;
+    --sidebar-border: 215 28% 25%;
+    --sidebar-accent: 215 28% 22%;
   }
 }
 
