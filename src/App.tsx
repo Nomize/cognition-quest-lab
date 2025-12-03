@@ -42,9 +42,9 @@ const App = () => (
           <Route
             path="/*"
             element={
-              <div className="flex min-h-screen w-full">
+              <div className="min-h-screen w-full">
                 <AppSidebar />
-                <main className="flex-1">
+                <main className="w-full pl-4 pt-16">
                   <Routes>
                     <Route path="/dashboard" element={<Dashboard />} />
                     <Route path="/profile" element={<Profile />} />
