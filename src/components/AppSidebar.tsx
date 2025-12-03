@@ -1,26 +1,23 @@
-import { Home, Gamepad2, BarChart3, Trophy, User, BookOpen, CreditCard, Settings as SettingsIcon, Sparkles, Menu, X, LogOut } from "lucide-react";
+import { Menu, X, LogOut } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { useSubscription } from "@/hooks/useSubscription";
 
 const menuItems = [
-  { title: "Dashboard", url: "/dashboard", icon: Home, emoji: "🏠" },
-  { title: "Quests", url: "/quests", icon: Gamepad2, emoji: "🎮" },
-  { title: "Progress", url: "/progress", icon: BarChart3, emoji: "📊" },
-  { title: "AI Insights", url: "/insights", icon: Sparkles, emoji: "✨" },
-  { title: "Achievements", url: "/achievements", icon: Trophy, emoji: "🏆" },
-  { title: "Learn", url: "/learn", icon: BookOpen, emoji: "📚" },
-  { title: "Profile", url: "/profile", icon: User, emoji: "👤" },
-  { title: "Settings", url: "/settings", icon: SettingsIcon, emoji: "⚙️" },
+  { title: "Dashboard", url: "/dashboard", emoji: "🏠" },
+  { title: "Quests", url: "/quests", emoji: "🎮" },
+  { title: "Progress", url: "/progress", emoji: "📊" },
+  { title: "Achievements", url: "/achievements", emoji: "🏆" },
+  { title: "Learn", url: "/learn", emoji: "📚" },
+  { title: "Upgrade", url: "/upgrade", emoji: "💎" },
+  { title: "Profile", url: "/profile", emoji: "👤" },
+  { title: "Settings", url: "/settings", emoji: "⚙️" },
 ];
 
 export function AppSidebar() {
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
-  const { isPremium } = useSubscription();
 
   const handleLogout = async () => {
     try {
@@ -35,16 +32,16 @@ export function AppSidebar() {
 
   return (
     <>
-      {/* Hamburger Icon - Top Right */}
+      {/* Hamburger Icon - Top Left */}
       <button 
-        className="fixed top-6 right-6 z-50 p-3 bg-primary rounded-lg shadow-lg hover:bg-primary/90 transition-all"
+        className="fixed top-6 left-6 z-50 p-3 bg-[#0FA3A3] rounded-lg shadow-lg hover:bg-[#0FA3A3]/90 transition-all"
         onClick={() => setIsOpen(!isOpen)}
         aria-label="Toggle menu"
       >
         {isOpen ? (
-          <X className="w-6 h-6 text-primary-foreground" />
+          <X className="w-6 h-6 text-white" />
         ) : (
-          <Menu className="w-6 h-6 text-primary-foreground" />
+          <Menu className="w-6 h-6 text-white" />
         )}
       </button>
 
@@ -56,14 +53,14 @@ export function AppSidebar() {
         />
       )}
 
-      {/* Slide-in Menu */}
+      {/* Slide-in Menu from Left */}
       <div className={`
-        fixed top-0 right-0 h-full w-80 bg-background border-l border-border
-        transform transition-transform duration-300 z-40 shadow-2xl
-        ${isOpen ? 'translate-x-0' : 'translate-x-full'}
+        fixed top-0 left-0 h-full w-80 bg-[#0F172A] border-r border-border
+        transform transition-transform duration-300 z-40 shadow-2xl overflow-y-auto
+        ${isOpen ? 'translate-x-0' : '-translate-x-full'}
       `}>
-        <nav className="pt-24 px-6 h-full flex flex-col">
-          <div className="flex-1 space-y-2">
+        <nav className="pt-20 px-6 pb-8 h-full flex flex-col">
+          <div className="flex-1 space-y-1">
             {menuItems.map((item) => (
               <NavLink
                 key={item.title}
@@ -72,38 +69,25 @@ export function AppSidebar() {
                 className={({ isActive }) =>
                   `flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
                     isActive 
-                      ? "bg-primary text-primary-foreground font-semibold shadow-md" 
-                      : "hover:bg-muted"
+                      ? "bg-white/10 text-white font-semibold" 
+                      : "text-white/80 hover:text-white hover:bg-white/5"
                   }`
                 }
               >
-                <span className="text-2xl">{item.emoji}</span>
+                <span className="text-xl">{item.emoji}</span>
                 <span className="text-base">{item.title}</span>
               </NavLink>
             ))}
           </div>
           
-          <div className="space-y-3 pb-6 border-t border-border pt-6">
-            {!isPremium && (
-              <Button 
-                onClick={() => {
-                  setIsOpen(false);
-                  navigate("/upgrade");
-                }}
-                className="w-full bg-primary hover:bg-primary/90"
-              >
-                ⭐ Upgrade to Premium
-              </Button>
-            )}
-            
-            <Button 
+          <div className="pt-6 border-t border-white/10">
+            <button 
               onClick={handleLogout}
-              variant="destructive" 
-              className="w-full"
+              className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-red-500/10 text-red-400 rounded-lg hover:bg-red-500/20 transition-colors"
             >
-              <LogOut className="w-4 h-4 mr-2" />
+              <LogOut className="w-4 h-4" />
               Logout
-            </Button>
+            </button>
           </div>
         </nav>
       </div>
