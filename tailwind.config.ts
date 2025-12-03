@@ -67,6 +67,12 @@ export default {
           DEFAULT: "hsl(var(--switch))",
           foreground: "hsl(var(--switch-foreground))",
         },
+        sidebar: {
+          DEFAULT: "hsl(var(--sidebar))",
+          foreground: "hsl(var(--sidebar-foreground))",
+          border: "hsl(var(--sidebar-border))",
+          accent: "hsl(var(--sidebar-accent))",
+        },
       },
       boxShadow: {
         soft: "var(--shadow-soft)",
