@@ -76,7 +76,7 @@ export function AppSidebar() {
       {/* Slide-in Sidebar */}
       <aside
         className={`
-          fixed top-0 left-0 h-full w-[260px] bg-sidebar border-r border-sidebar-border
+          fixed top-0 left-0 h-screen w-[260px] bg-sidebar/80 backdrop-blur-xl border-r border-sidebar-border/50
           transform transition-transform duration-300 ease-in-out z-40 shadow-2xl
           ${isOpen ? "translate-x-0" : "-translate-x-full"}
         `}
