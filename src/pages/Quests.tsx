@@ -16,6 +16,7 @@ const Quests = () => {
       id: "focus",
       title: "Focus Quest",
       description: "Find all target shapes as fast as you can",
+      trains: "Visual attention, selective focus, and target detection speed. Improves your ability to quickly identify relevant information while filtering out distractions.",
       icon: Target,
       color: "text-focus",
       bgColor: "bg-focus/10",
@@ -28,6 +29,7 @@ const Quests = () => {
       id: "memory",
       title: "Memory Quest",
       description: "Remember and recall color sequences",
+      trains: "Working memory capacity, sequential recall, and visual memory encoding. Strengthens your ability to hold and manipulate information in your mind.",
       icon: MemoryStick,
       color: "text-memory",
       bgColor: "bg-memory/10",
@@ -40,6 +42,7 @@ const Quests = () => {
       id: "speed",
       title: "Speed Quest",
       description: "Click green circles, avoid others",
+      trains: "Processing speed, inhibitory control, and quick decision-making. Enhances your reaction time and ability to respond accurately under time pressure.",
       icon: Zap,
       color: "text-speed",
       bgColor: "bg-speed/10",
@@ -52,6 +55,7 @@ const Quests = () => {
       id: "switch",
       title: "Brain Switch",
       description: "Adapt to changing rules quickly",
+      trains: "Cognitive flexibility, task-switching ability, and adaptive thinking. Develops your mental agility and ability to shift between different rules and strategies.",
       icon: Shuffle,
       color: "text-switch",
       bgColor: "bg-switch/10",
@@ -64,6 +68,7 @@ const Quests = () => {
       id: "calm",
       title: "Calm Quest",
       description: "Practice mindful breathing",
+      trains: "Emotional regulation, stress management, and sustained attention. Builds your ability to maintain focus while remaining calm and centered.",
       icon: Heart,
       color: "text-calm",
       bgColor: "bg-calm/10",
@@ -76,6 +81,7 @@ const Quests = () => {
       id: "memory-maze",
       title: "Memory Maze",
       description: "4x4 grid path recall challenge",
+      trains: "Spatial memory, pattern recognition, and sequential processing. Enhances your ability to remember and navigate complex spatial information.",
       icon: Brain,
       color: "text-memory",
       bgColor: "bg-memory/10",
@@ -88,6 +94,7 @@ const Quests = () => {
       id: "focus-flip",
       title: "Focus Flip",
       description: "Find matching symbols in grid",
+      trains: "Visual scanning, pattern matching, and sustained attention. Improves your ability to systematically search and identify matching elements.",
       icon: Grid3x3,
       color: "text-focus",
       bgColor: "bg-focus/10",
@@ -100,6 +107,7 @@ const Quests = () => {
       id: "pattern-sprint",
       title: "Pattern Sprint",
       description: "Predict the next pattern",
+      trains: "Logical reasoning, sequence analysis, and predictive thinking. Develops your ability to identify patterns and anticipate what comes next.",
       icon: Sparkles,
       color: "text-speed",
       bgColor: "bg-speed/10",
@@ -112,6 +120,7 @@ const Quests = () => {
       id: "mind-match",
       title: "Mind Match",
       description: "Classic card matching game",
+      trains: "Visual memory, concentration, and recall speed. Strengthens your ability to remember locations and match information across time.",
       icon: Layers,
       color: "text-memory",
       bgColor: "bg-memory/10",
@@ -124,6 +133,7 @@ const Quests = () => {
       id: "reaction-run",
       title: "Reaction Run",
       description: "Fast target hitting challenge",
+      trains: "Reaction time, hand-eye coordination, and processing speed. Enhances your reflexes and ability to respond quickly to visual stimuli.",
       icon: Zap,
       color: "text-speed",
       bgColor: "bg-speed/10",
@@ -186,6 +196,14 @@ const Quests = () => {
                 </CardHeader>
 
                 <CardContent className="space-y-4">
+                  {/* What This Trains Section */}
+                  <div className="bg-muted/50 dark:bg-white/5 rounded-md p-3">
+                    <p className="text-sm">
+                      <span className="font-semibold">🧠 What This Trains: </span>
+                      <span className="text-muted-foreground">{quest.trains}</span>
+                    </p>
+                  </div>
+
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-muted-foreground">Difficulty:</span>
                     <span className={`font-semibold ${quest.color}`}>
