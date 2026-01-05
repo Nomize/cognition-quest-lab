@@ -980,7 +980,68 @@ CogniQuest uses proven engagement mechanics:
         </div>
       </div>
 
-      <div className="container mx-auto max-w-6xl px-4 py-12 space-y-8">
+      <div className="container mx-auto max-w-6xl px-4 py-12 space-y-12">
+        {/* Video Lessons Section */}
+        <section className="space-y-6">
+          <div className="flex items-center gap-3">
+            <Play className="w-8 h-8 text-primary" />
+            <h2 className="text-2xl font-bold">Video Lessons</h2>
+          </div>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[
+              {
+                title: "Introduction to Cognitive Training",
+                embedUrl: "https://www.youtube.com/embed/5MuIMqhT8DM",
+                duration: "10 mins",
+              },
+              {
+                title: "Memory Enhancement Techniques",
+                embedUrl: "https://www.youtube.com/embed/mh5uEqPvuq0",
+                duration: "12 mins",
+              },
+              {
+                title: "Focus and Concentration Strategies",
+                embedUrl: "https://www.youtube.com/embed/4O2JK_94g3Y",
+                duration: "15 mins",
+              },
+              {
+                title: "Speed Reading Fundamentals",
+                embedUrl: "https://www.youtube.com/embed/ZwEquW_Yij0",
+                duration: "8 mins",
+              },
+              {
+                title: "Mental Math Mastery",
+                embedUrl: "https://www.youtube.com/embed/GF-23wDfvt0",
+                duration: "10 mins",
+              },
+              {
+                title: "Problem-Solving Skills",
+                embedUrl: "https://www.youtube.com/embed/v34NqCbAA1c",
+                duration: "14 mins",
+              },
+            ].map((video, index) => (
+              <Card key={index} className="overflow-hidden">
+                <div className="aspect-video bg-muted">
+                  <iframe
+                    src={video.embedUrl}
+                    title={video.title}
+                    className="w-full h-full"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  />
+                </div>
+                <CardContent className="pt-4">
+                  <h3 className="font-semibold text-lg mb-1">{video.title}</h3>
+                  <div className="flex items-center text-sm text-muted-foreground">
+                    <Clock className="w-4 h-4 mr-1" />
+                    {video.duration}
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </section>
+
         {/* Search and Filters */}
         <Card>
           <CardContent className="pt-6 space-y-4">

@@ -255,9 +255,15 @@ const Dashboard = () => {
                 <CardDescription>
                   Train attention & concentration
                 </CardDescription>
-                <div className="text-xs text-muted-foreground mt-2">⏱️ 2-3 min</div>
               </CardHeader>
-              <CardContent>
+              <CardContent className="space-y-4">
+                <div className="bg-muted/50 dark:bg-white/5 rounded-md p-3">
+                  <p className="text-sm">
+                    <span className="font-semibold">🧠 What This Trains: </span>
+                    <span className="text-muted-foreground">Visual attention and target detection speed.</span>
+                  </p>
+                </div>
+                <div className="text-xs text-muted-foreground">⏱️ 2-3 min</div>
                 <Button className="w-full bg-focus hover:bg-focus/90 text-focus-foreground">
                   Start Quest
                 </Button>
@@ -276,9 +282,15 @@ const Dashboard = () => {
                 <CardDescription>
                   Pattern recall & working memory
                 </CardDescription>
-                <div className="text-xs text-muted-foreground mt-2">⏱️ 2-3 min</div>
               </CardHeader>
-              <CardContent>
+              <CardContent className="space-y-4">
+                <div className="bg-muted/50 dark:bg-white/5 rounded-md p-3">
+                  <p className="text-sm">
+                    <span className="font-semibold">🧠 What This Trains: </span>
+                    <span className="text-muted-foreground">Working memory capacity and sequential recall.</span>
+                  </p>
+                </div>
+                <div className="text-xs text-muted-foreground">⏱️ 2-3 min</div>
                 <Button className="w-full bg-memory hover:bg-memory/90 text-memory-foreground">
                   Start Quest
                 </Button>
@@ -297,9 +309,15 @@ const Dashboard = () => {
                 <CardDescription>
                   Reaction time challenge
                 </CardDescription>
-                <div className="text-xs text-muted-foreground mt-2">⏱️ 2 min</div>
               </CardHeader>
-              <CardContent>
+              <CardContent className="space-y-4">
+                <div className="bg-muted/50 dark:bg-white/5 rounded-md p-3">
+                  <p className="text-sm">
+                    <span className="font-semibold">🧠 What This Trains: </span>
+                    <span className="text-muted-foreground">Processing speed and quick decision-making.</span>
+                  </p>
+                </div>
+                <div className="text-xs text-muted-foreground">⏱️ 2 min</div>
                 <Button className="w-full bg-speed hover:bg-speed/90 text-speed-foreground">
                   Start Quest
                 </Button>
@@ -318,9 +336,15 @@ const Dashboard = () => {
                 <CardDescription>
                   Cognitive flexibility training
                 </CardDescription>
-                <div className="text-xs text-muted-foreground mt-2">⏱️ 3 min</div>
               </CardHeader>
-              <CardContent>
+              <CardContent className="space-y-4">
+                <div className="bg-muted/50 dark:bg-white/5 rounded-md p-3">
+                  <p className="text-sm">
+                    <span className="font-semibold">🧠 What This Trains: </span>
+                    <span className="text-muted-foreground">Cognitive flexibility and task-switching ability.</span>
+                  </p>
+                </div>
+                <div className="text-xs text-muted-foreground">⏱️ 3 min</div>
                 <Button className="w-full bg-switch hover:bg-switch/90 text-switch-foreground">
                   Start Quest
                 </Button>
@@ -339,9 +363,15 @@ const Dashboard = () => {
                 <CardDescription>
                   Mindfulness breathing exercise
                 </CardDescription>
-                <div className="text-xs text-muted-foreground mt-2">⏱️ 3-5 min</div>
               </CardHeader>
-              <CardContent>
+              <CardContent className="space-y-4">
+                <div className="bg-muted/50 dark:bg-white/5 rounded-md p-3">
+                  <p className="text-sm">
+                    <span className="font-semibold">🧠 What This Trains: </span>
+                    <span className="text-muted-foreground">Emotional regulation and stress management.</span>
+                  </p>
+                </div>
+                <div className="text-xs text-muted-foreground">⏱️ 3-5 min</div>
                 <Button className="w-full bg-calm hover:bg-calm/90 text-calm-foreground">
                   Start Quest
                 </Button>
