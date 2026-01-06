@@ -31,7 +31,7 @@ The benefits of cognitive training extend beyond just mental performance. Resear
 Long-term memory, on the other hand, stores information for extended periods — sometimes for a lifetime. Information moves from short-term to long-term storage through repetition, emotional connection, and meaningful association. Understanding this process is key to improving your overall memory performance.
 
 Proven techniques to enhance memory include chunking (grouping information into smaller units), spaced repetition (reviewing material at increasing intervals), and elaborative encoding (connecting new information to existing knowledge). Sleep also plays a crucial role, as memory consolidation primarily occurs during deep sleep phases.`,
-    videoUrl: "https://www.youtube.com/embed/mh5uEqPvuq0",
+    videoUrl: "https://www.youtube.com/embed/TUoJc0NPajQ",
     readTime: "4 min read",
   },
   {
@@ -42,7 +42,7 @@ Proven techniques to enhance memory include chunking (grouping information into 
 The average human attention span has been impacted by our increasingly digital world. Common attention disruptors include notifications, multitasking, stress, and lack of sleep. However, research shows that attention can be strengthened through deliberate practice and environmental design.
 
 Strategies to improve focus include time-blocking (dedicating specific periods to single tasks), the Pomodoro Technique (25-minute focused work sessions), minimizing environmental distractions, and regular mindfulness practice. Even brief meditation sessions have been shown to significantly improve attention control and reduce mind-wandering.`,
-    videoUrl: "https://www.youtube.com/embed/4O2JK_94g3Y",
+    videoUrl: "https://www.youtube.com/embed/Hu4Yvq-g7_Y",
     readTime: "3 min read",
   },
   {
@@ -53,7 +53,7 @@ Strategies to improve focus include time-blocking (dedicating specific periods t
 Several factors influence processing speed, including the amount of myelin (insulation around nerve fibers), neural efficiency, and neurotransmitter function. While processing speed naturally peaks in our mid-20s and gradually declines, regular training can maintain or even improve this ability at any age.
 
 Reaction time training has been shown to improve simple reaction time by 10-15%, enhance response inhibition (the ability to stop inappropriate responses), and translate to real-world benefits like better driving reflexes and sports performance. Physical exercise, adequate sleep, proper hydration, and nutrition (especially omega-3 fatty acids) all support optimal processing speed.`,
-    videoUrl: "https://www.youtube.com/embed/ZwEquW_Yij0",
+    videoUrl: "https://www.youtube.com/embed/UBVV8pch1dM",
     readTime: "3 min read",
   },
   {
@@ -64,7 +64,7 @@ Reaction time training has been shown to improve simple reaction time by 10-15%,
 Several lifestyle factors significantly impact brain health and neuroplasticity. Quality sleep is essential for memory consolidation and clearing metabolic waste from the brain. Regular physical exercise increases blood flow to the brain and promotes the release of growth factors that support neuron health.
 
 Nutrition also plays a vital role — omega-3 fatty acids, antioxidants, and B vitamins are particularly important for brain function. Social connection, stress management, and continuous learning all contribute to maintaining cognitive reserve. By understanding these factors, you can create a comprehensive approach to brain health that goes beyond simple exercises.`,
-    videoUrl: "https://www.youtube.com/embed/GF-23wDfvt0",
+    videoUrl: "https://www.youtube.com/embed/ELpfYCZa87g",
     readTime: "4 min read",
   },
   {
@@ -75,7 +75,7 @@ Nutrition also plays a vital role — omega-3 fatty acids, antioxidants, and B v
 Habit formation is crucial for long-term success. Research shows it takes an average of 66 days to form a new habit. The key is starting small — even 5-10 minutes of daily practice can establish a sustainable routine. Tracking your progress and celebrating small wins activates reward pathways that reinforce the habit.
 
 Maintaining cognitive wellness requires a balanced approach. Variety in training prevents boredom and ensures you're exercising different cognitive domains. Setting realistic goals, finding intrinsic motivation (such as enjoying the challenge itself), and understanding that progress isn't always linear will help you maintain a healthy relationship with your cognitive training practice.`,
-    videoUrl: "https://www.youtube.com/embed/v34NqCbAA1c",
+    videoUrl: "https://www.youtube.com/embed/75d_29QWELk",
     readTime: "3 min read",
   },
 ];
