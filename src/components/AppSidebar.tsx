@@ -76,15 +76,15 @@ export function AppSidebar() {
         />
       )}
 
-      {/* Slide-in Sidebar */}
+      {/* Slide-in Sidebar - Claude-style Glassmorphism */}
       <aside
         className={`
-          fixed top-0 left-0 h-screen w-[260px] backdrop-blur-xl
+          fixed top-0 left-0 bottom-0 w-[260px] backdrop-blur-xl
           transform transition-all duration-300 ease-in-out z-40 shadow-2xl
           ${isOpen ? "translate-x-0" : "-translate-x-full"}
           ${isDarkMode 
-            ? "bg-[#0F172A] border-r border-white/10" 
-            : "bg-white border-r border-gray-200"
+            ? "bg-[#0F172A]/80 border-r border-white/10" 
+            : "bg-white/80 border-r border-gray-200"
           }
         `}
       >
