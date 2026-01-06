@@ -55,9 +55,9 @@ export function AppSidebar() {
 
   return (
     <>
-      {/* Toggle Button - Always Visible */}
+      {/* Toggle Button - Visible on mobile, hidden on desktop */}
       <button
-        className="fixed top-4 left-4 z-50 p-3 bg-primary rounded-lg shadow-lg hover:bg-primary/90 transition-all duration-200"
+        className="fixed top-4 left-4 z-50 p-3 bg-primary rounded-lg shadow-lg hover:bg-primary/90 transition-all duration-200 lg:hidden"
         onClick={() => setIsOpen(!isOpen)}
         aria-label="Toggle menu"
       >
@@ -68,20 +68,20 @@ export function AppSidebar() {
         )}
       </button>
 
-      {/* Dark Overlay */}
+      {/* Dark Overlay - Only on mobile when open */}
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black/50 z-30 backdrop-blur-sm transition-opacity duration-200"
+          className="fixed inset-0 bg-black/50 z-30 backdrop-blur-sm transition-opacity duration-200 lg:hidden"
           onClick={() => setIsOpen(false)}
         />
       )}
 
-      {/* Slide-in Sidebar - Claude-style Glassmorphism */}
+      {/* Sidebar - Claude-style Glassmorphism, always visible on desktop */}
       <aside
         className={`
           fixed top-0 left-0 bottom-0 w-[260px] backdrop-blur-xl
           transform transition-all duration-300 ease-in-out z-40 shadow-2xl
-          ${isOpen ? "translate-x-0" : "-translate-x-full"}
+          ${isOpen ? "translate-x-0" : "-translate-x-full"} lg:translate-x-0
           ${isDarkMode 
             ? "bg-[#0F172A]/80 border-r border-white/10" 
             : "bg-white/80 border-r border-gray-200"

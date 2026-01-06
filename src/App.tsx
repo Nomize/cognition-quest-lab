@@ -44,7 +44,7 @@ const App = () => (
             element={
               <div className="min-h-screen w-full">
                 <AppSidebar />
-                <main className="w-full pl-4 pt-16">
+                <main className="w-full pl-4 pt-16 lg:pl-[276px] transition-all duration-300">
                   <Routes>
                     <Route path="/dashboard" element={<Dashboard />} />
                     <Route path="/profile" element={<Profile />} />
