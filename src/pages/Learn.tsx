@@ -1,6 +1,8 @@
+import { useState, useMemo } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { BookOpen, Clock } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { BookOpen, Clock, Search } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
 
 interface Article {
@@ -83,6 +85,17 @@ Maintaining cognitive wellness requires a balanced approach. Variety in training
 const Learn = () => {
   const { theme } = useTheme();
   const isDarkMode = theme === "dark";
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredArticles = useMemo(() => {
+    if (!searchQuery.trim()) return articles;
+    const query = searchQuery.toLowerCase();
+    return articles.filter(
+      (article) =>
+        article.title.toLowerCase().includes(query) ||
+        article.content.toLowerCase().includes(query)
+    );
+  }, [searchQuery]);
 
   return (
     <div className="min-h-screen p-6 md:p-8">
@@ -93,14 +106,31 @@ const Learn = () => {
             <BookOpen className="w-8 h-8 text-primary" />
             <h1 className="text-3xl font-bold text-foreground">Knowledge Library</h1>
           </div>
-          <p className="text-muted-foreground">
+          <p className="text-muted-foreground mb-6">
             Explore articles and videos to deepen your understanding of cognitive science and brain training.
           </p>
+
+          {/* Search Bar */}
+          <div className="relative max-w-md">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input
+              type="text"
+              placeholder="Search articles by title or content..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10"
+            />
+          </div>
         </div>
 
         {/* Articles Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {articles.map((article) => (
+        {filteredArticles.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-muted-foreground text-lg">No articles found matching "{searchQuery}"</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {filteredArticles.map((article) => (
             <Card
               key={article.id}
               className={`overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:shadow-xl ${
@@ -154,9 +184,10 @@ const Learn = () => {
                   </div>
                 </div>
               </CardContent>
-            </Card>
-          ))}
-        </div>
+              </Card>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
